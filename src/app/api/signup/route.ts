@@ -7,6 +7,7 @@ const signupSchema = z.object({
 	email: z.string().email(),
 	name: z.string().min(1).max(100).optional(),
 	password: z.string().min(6),
+	isTdah: z.boolean().optional().default(false),
 });
 
 export async function POST(request: Request) {
@@ -16,16 +17,17 @@ export async function POST(request: Request) {
 		if (!parsed.success) {
 			return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
 		}
-		const { email, name, password } = parsed.data;
+		const { email, name, password, isTdah } = parsed.data;
 		const existing = await prisma.user.findUnique({ where: { email } });
 		if (existing) {
 			return NextResponse.json({ error: "Email already in use" }, { status: 409 });
 		}
 		const passwordHash = await bcrypt.hash(password, 10);
-		const trialEndsAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+		// essai gratuit de 7 jours
+		const trialEndsAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 		const user = await prisma.user.create({
-			data: { email, name, passwordHash, trialEndsAt },
-			select: { id: true, email: true, name: true, trialEndsAt: true },
+			data: { email, name, passwordHash, trialEndsAt, isTdah: Boolean(isTdah) },
+			select: { id: true, email: true, name: true, trialEndsAt: true, isTdah: true },
 		});
 		return NextResponse.json({ user }, { status: 201 });
 	} catch (e) {

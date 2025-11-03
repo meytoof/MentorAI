@@ -28,7 +28,7 @@ export default function Home() {
                 href="/signup"
                 className="inline-flex items-center justify-center rounded-md bg-blue-600 px-6 py-3 text-base font-medium text-white hover:bg-blue-700 transition-colors"
               >
-                Essai gratuit 1 jour
+                Essai gratuit une semaine
               </Link>
               <Link
                 href="#fonctionnalites"

@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Connexion | Devoirs",
+  title: "Connexion | MentorIa",
   description: "Connectez-vous pour accéder au tableau et à l'assistance IA.",
 };
 
@@ -32,5 +32,7 @@ export default function SigninLayout({
     </html>
   );
 }
+
+
 
 

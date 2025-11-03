@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "MentorIa - Aide aux devoirs intelligente pour enfants",
   description:
-    "Plateforme d'aide aux devoirs qui guide votre enfant vers la solution sans donner les réponses. Assistance pédagogique adaptée avec IA et tableau interactif. Essai gratuit 1 jour.",
+    "Plateforme d'aide aux devoirs qui guide votre enfant vers la solution sans donner les réponses. Assistance pédagogique adaptée avec IA et tableau interactif. Essai gratuit une semaine.",
 };
 
 export default function RootLayout({

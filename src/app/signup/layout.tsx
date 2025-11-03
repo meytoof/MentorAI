@@ -1,3 +1,4 @@
+import Navbar from "@/components/ui/Navbar";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "../globals.css";
@@ -13,8 +14,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Inscription | Devoirs",
-  description: "Créez votre compte et profitez d'un essai gratuit de 1 jour.",
+  title: "Inscription | MentorIa",
+  description:
+    "Créez votre compte et profitez d'un essai gratuit de une semaine.",
 };
 
 export default function SignupLayout({
@@ -24,13 +26,14 @@ export default function SignupLayout({
 }>) {
   return (
     <html lang="fr">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      >
         <div className="min-h-screen bg-neutral-900 text-neutral-100">
+          <Navbar />
           {children}
         </div>
       </body>
     </html>
   );
 }
-
-
