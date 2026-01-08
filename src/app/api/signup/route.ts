@@ -3,6 +3,8 @@ import bcrypt from "bcrypt";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
+export const runtime = "nodejs";
+
 const signupSchema = z.object({
 	email: z.string().email(),
 	name: z.string().min(1).max(100).optional(),
