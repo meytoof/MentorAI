@@ -8,14 +8,28 @@ datasource db {
 }
 
 model User {
-  id           String   @id @default(cuid())
-  email        String   @unique
+  id           String        @id @default(cuid())
+  email        String        @unique
   name         String?
   passwordHash String
   trialEndsAt  DateTime
-  isTdah       Boolean  @default(false)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  isTdah       Boolean       @default(false)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  conversations Conversation[]
+}
+
+model Conversation {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  question  String
+  hint      String
+  drawing   String?  // JSON stringifié des instructions de dessin
+  encouragement String?
+  createdAt DateTime @default(now())
+  
+  @@index([userId, createdAt])
 }
 
 
