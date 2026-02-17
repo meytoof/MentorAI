@@ -9,9 +9,10 @@ export async function middleware(req: NextRequest) {
 	const needsAuth = PROTECTED_PREFIXES.some((p) => pathname.startsWith(p));
 	if (!needsAuth) return NextResponse.next();
 
-    const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+	const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
 	if (!token?.userId) {
-		const url = new URL("/signin", req.url);
+		const url = new URL("/accueil", req.url);
+		url.searchParams.set("login", "1");
 		url.searchParams.set("callbackUrl", pathname);
 		return NextResponse.redirect(url);
 	}

@@ -142,3 +142,4 @@ Aucune configuration supplémentaire nécessaire ! Le système :
 - **Limite historique** : 10 dernières conversations (configurable)
 - **Taille canvas** : Image PNG compressée à 80%
 - **Sécurité** : Chaque utilisateur ne voit que ses propres conversations
+

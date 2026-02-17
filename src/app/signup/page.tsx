@@ -80,7 +80,7 @@ export default function SignUpPage() {
         }),
       });
       if (res.ok) {
-        router.push("/signin");
+        router.push("/accueil?login=1");
       } else {
         type ErrorResponse = { error?: string } | undefined;
         const j: ErrorResponse = await res.json().catch(() => undefined);
@@ -96,7 +96,7 @@ export default function SignUpPage() {
       <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-2">
         <div className="order-2 lg:order-1">
           <h1 className="mb-4 text-3xl font-bold sm:text-4xl">
-            Commencez votre essai gratuit d&apos; une semaine.
+            Commencez votre essai gratuit de 1 jour.
           </h1>
           <p className="mb-6 max-w-xl text-neutral-300">
             Une plateforme d&apos;aide aux devoirs qui motive votre enfant.
@@ -225,15 +225,21 @@ export default function SignUpPage() {
                   />
                 </HoverHalo>
               </div>
-              <div className="flex items-start gap-2">
-                <input
-                  name="isTdah"
-                  id="is-tdah"
-                  type="checkbox"
-                  className="mt-0.5 size-4 rounded border-neutral-700 bg-neutral-950 text-blue-600 focus:ring-0"
-                />
-                <label htmlFor="is-tdah" className="text-sm text-neutral-300">
-                  Mon enfant est TDAH ?
+              <div className="rounded-lg border border-blue-500/30 bg-blue-500/5 p-4">
+                <p className="mb-3 text-sm font-medium text-blue-200">
+                  Votre enfant a-t-il un trouble de l&apos;attention (TDAH) ?
+                </p>
+                <p className="mb-3 text-xs text-neutral-400">
+                  Nous adapterons l&apos;interface : plus épurée et sans distractions pour faciliter la concentration.
+                </p>
+                <label className="flex cursor-pointer items-center gap-3">
+                  <input
+                    name="isTdah"
+                    id="is-tdah"
+                    type="checkbox"
+                    className="size-4 rounded border-neutral-700 bg-neutral-950 text-blue-600 focus:ring-0"
+                  />
+                  <span className="text-sm text-neutral-300">Oui, mon enfant est TDAH</span>
                 </label>
               </div>
               <button

@@ -21,26 +21,34 @@ export const authOptions: NextAuthOptions = {
 				const parsed = credentialsSchema.safeParse(raw);
 				if (!parsed.success) return null;
 				const { email, password } = parsed.data;
-				const user = await prisma.user.findUnique({ where: { email } });
+				const user = await prisma.user.findUnique({ where: { email }, select: { id: true, email: true, name: true, isTdah: true, passwordHash: true } });
 				if (!user) return null;
 				const ok = await bcrypt.compare(password, user.passwordHash);
 				if (!ok) return null;
-				return { id: user.id, email: user.email, name: user.name } as any;
+				const { passwordHash: _, ...safeUser } = user;
+				return safeUser;
 			},
 		}),
 	],
 	pages: {
-		signIn: "/signin",
+		signIn: "/accueil",
 	},
 	session: { strategy: "jwt" },
 	callbacks: {
 		jwt: async ({ token, user }) => {
-			if (user?.id) token.userId = (user as any).id;
+			if (user?.id) {
+				token.userId = (user as { id: string }).id;
+				token.name = (user as { name?: string }).name;
+				token.email = (user as { email?: string }).email;
+				token.isTdah = (user as { isTdah?: boolean }).isTdah ?? false;
+			}
 			return token;
 		},
 		session: async ({ session, token }) => {
 			if (token?.userId && session.user) {
-				(session.user as any).id = token.userId;
+				(session.user as { id?: string }).id = token.userId as string;
+				(session.user as { name?: string | null }).name = (token.name as string) ?? null;
+				(session.user as { isTdah?: boolean }).isTdah = (token.isTdah as boolean) ?? false;
 			}
 			return session;
 		},

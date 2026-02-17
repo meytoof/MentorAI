@@ -1,6 +1,15 @@
+"use client";
+
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
 export default function Footer() {
+  const [year, setYear] = useState<number | null>(null);
+
+  useEffect(() => {
+    setYear(new Date().getFullYear());
+  }, []);
+
   return (
     <footer className="border-t border-neutral-800 bg-neutral-900">
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
@@ -9,12 +18,11 @@ export default function Footer() {
           <div className="col-span-1 md:col-span-2">
             <div className="mb-4 flex items-center">
               <div className="size-8 rounded bg-blue-600"></div>
-              <span className="ml-2 text-lg font-semibold text-white">Devoirs</span>
+              <span className="ml-2 text-lg font-semibold text-white">MentorIa</span>
             </div>
             <p className="mb-4 max-w-md text-sm text-neutral-400">
-              Plateforme d'aide aux devoirs intelligente qui guide les enfants 
-              vers l'autonomie et la confiance en soi grâce à une assistance 
-              pédagogique adaptée.
+              L&apos;IA qui aide ton enfant à faire ses devoirs sans jamais donner la réponse.
+              Conçu pour le primaire (CP-CM2) et validé avec des spécialistes TDAH.
             </p>
           </div>
 
@@ -28,12 +36,12 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="#fonctionnalites" className="text-neutral-400 hover:text-white transition-colors">
+                <Link href="/accueil#fonctionnalites" className="text-neutral-400 hover:text-white transition-colors">
                   Fonctionnalités
                 </Link>
               </li>
               <li>
-                <Link href="#tarifs" className="text-neutral-400 hover:text-white transition-colors">
+                <Link href="/accueil#tarifs" className="text-neutral-400 hover:text-white transition-colors">
                   Tarifs
                 </Link>
               </li>
@@ -77,7 +85,7 @@ export default function Footer() {
         <div className="mt-12 border-t border-neutral-800 pt-8">
           <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
             <p className="text-sm text-neutral-400">
-              © {new Date().getFullYear()} Devoirs. Tous droits réservés.
+              © {year ?? 2025} MentorIa. Tous droits réservés.
             </p>
             <div className="flex gap-6 text-sm text-neutral-400">
               <Link href="/cgv" className="hover:text-white transition-colors">

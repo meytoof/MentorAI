@@ -14,9 +14,17 @@ model User {
   passwordHash String
   trialEndsAt  DateTime
   isTdah       Boolean       @default(false)
+  signupIp     String?       // IP utilisée à l'inscription (anti-abuse)
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
   conversations Conversation[]
+}
+
+// Anti-abuse : limite 1 inscription par IP sur 7 jours (évite de recréer des comptes pour l'essai)
+model SignupFromIp {
+  ip        String   @id
+  count     Int      @default(1)
+  lastAt    DateTime @updatedAt
 }
 
 model Conversation {

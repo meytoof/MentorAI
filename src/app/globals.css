@@ -122,3 +122,30 @@
     @apply bg-background text-foreground;
   }
 }
+
+@keyframes gradient-drift {
+  0%, 100% { background-position: 0% 50%; }
+  25% { background-position: 50% 100%; }
+  50% { background-position: 100% 50%; }
+  75% { background-position: 50% 0%; }
+}
+@keyframes voice-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.4; }
+  50% { transform: scale(1.15); opacity: 0.8; }
+}
+@keyframes voice-pulse-active {
+  0%, 100% { transform: scale(1); opacity: 0.4; }
+  50% { transform: scale(1.35); opacity: 0.9; }
+}
+@keyframes welcome-in {
+  0% { opacity: 0; transform: scale(0.8); }
+  100% { opacity: 1; transform: scale(1); }
+}
+@keyframes welcome-out {
+  0% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(0.95); }
+}
+@keyframes bubble-in {
+  0% { opacity: 0; transform: translateY(8px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
