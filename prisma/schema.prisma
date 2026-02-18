@@ -11,7 +11,7 @@ model User {
   id                   String        @id @default(cuid())
   email                String        @unique
   name                 String?
-  passwordHash         String
+  passwordHash         String?
   trialEndsAt          DateTime
   isTdah               Boolean       @default(false)
   signupIp             String?
@@ -30,6 +30,11 @@ model User {
   difficultSubjects    String?       // Texte libre : matières/difficultés décrites par le parent
   learningObjective    String?       // Texte libre : objectif pédagogique
   isAdmin              Boolean       @default(false)
+  // Gamification
+  childMascot          String?       // "owl"|"fox"|"turtle"|"frog"|"lion"|"elephant"|"dolphin"|"panda"
+  xp                   Int           @default(0)
+  streak               Int           @default(0)
+  lastSessionAt        DateTime?
   createdAt            DateTime      @default(now())
   updatedAt            DateTime      @updatedAt
   conversations        Conversation[]

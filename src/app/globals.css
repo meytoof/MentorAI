@@ -154,3 +154,47 @@
   0% { transform: translateX(0); }
   100% { transform: translateX(-50%); }
 }
+
+/* ---- Thèmes visuels ---- */
+:root {
+  --theme-bg-from: #0f1624;
+  --theme-bg-to: #1a2744;
+}
+[data-theme="classic"] {
+  --theme-bg-from: #0f1624;
+  --theme-bg-to: #1a2744;
+}
+[data-theme="space"] {
+  --theme-bg-from: #0a0118;
+  --theme-bg-to: #1a0a3e;
+}
+[data-theme="ocean"] {
+  --theme-bg-from: #0c1f3f;
+  --theme-bg-to: #0e4060;
+}
+[data-theme="forest"] {
+  --theme-bg-from: #0a1f0a;
+  --theme-bg-to: #0f3320;
+}
+
+/* ---- Animations mascotte ---- */
+@keyframes mascot-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+@keyframes mascot-appear {
+  0% { opacity: 0; transform: scale(0.5) translateY(10px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+@keyframes theme-picker-in {
+  0% { opacity: 0; transform: translateY(-8px) scale(0.97); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes modal-in {
+  0% { opacity: 0; transform: scale(0.92); }
+  100% { opacity: 1; transform: scale(1); }
+}
+@keyframes pomodoro-tick {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}

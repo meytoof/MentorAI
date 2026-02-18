@@ -2,7 +2,10 @@
 
 import { AIDrawingResponse } from "@/types/drawing";
 import { useSession } from "next-auth/react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
+import { useTheme } from "@/components/dashboard/ThemePicker";
+import MascotPicker, { MASCOTTES, type MascotId } from "@/components/dashboard/MascotPicker";
+import CustomizationDrawer from "@/components/dashboard/CustomizationDrawer";
 
 interface Segment {
   id: string;
@@ -42,12 +45,59 @@ export default function WhiteboardPage() {
   const [hoveredMsgIdx, setHoveredMsgIdx] = useState<number | null>(null);
   const [tooltip, setTooltip] = useState<TooltipState | null>(null);
 
+  // Gamification
+  const [mascot, setMascot] = useState<MascotId | null>(null);
+  const [showMascotPicker, setShowMascotPicker] = useState(false);
+  const [mascotPhrase, setMascotPhrase] = useState("");
+  const mascotPhraseTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const { theme } = useTheme();
+
   const childName = (session?.user as { name?: string } | undefined)?.name ?? "toi";
   const isTdah = (session?.user as { isTdah?: boolean } | undefined)?.isTdah ?? false;
+  const sessionMascot = (session?.user as { childMascot?: string | null } | undefined)?.childMascot as MascotId | null;
+
+  // Init mascot from session
+  useEffect(() => {
+    if (sessionMascot) {
+      setMascot(sessionMascot);
+    }
+  }, [sessionMascot]);
+
+  // Show mascot picker 2s after load if no mascot
+  useEffect(() => {
+    if (!isTdah && sessionMascot === null && session?.user) {
+      const t = setTimeout(() => setShowMascotPicker(true), 2000);
+      return () => clearTimeout(t);
+    }
+  }, [isTdah, sessionMascot, session?.user]);
+
+  // Rotate mascot phrase every 5 minutes
+  useEffect(() => {
+    if (!mascot) return;
+    const mascotData = MASCOTTES.find((m) => m.id === mascot);
+    if (!mascotData) return;
+    const pick = () => {
+      const phrases = mascotData.phrases;
+      setMascotPhrase(phrases[Math.floor(Math.random() * phrases.length)]);
+    };
+    pick();
+    mascotPhraseTimerRef.current = setInterval(pick, 5 * 60 * 1000);
+    return () => clearInterval(mascotPhraseTimerRef.current!);
+  }, [mascot]);
+
+  // Award XP fire-and-forget
+  const awardXP = useCallback((points: number) => {
+    fetch("/api/user/xp", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ points }),
+    }).catch(() => {});
+  }, []);
 
   useEffect(() => {
     if (isTdah) {
-      setShowWelcome(false); // TDAH : pas d'animation de bienvenue
+      setShowWelcome(false);
       return;
     }
     const t = setTimeout(() => setWelcomeDone(true), 2800);
@@ -161,6 +211,7 @@ export default function WhiteboardPage() {
         return sN === motN || motN.startsWith(sN) || sN.startsWith(motN) || motN.includes(sN) || sN.includes(motN);
       });
       const tooltipText = segment?.shortTip || segment?.lesson || "";
+      void tooltipText;
       redParts.push(
         <span
           key={`red-${keyCounter++}`}
@@ -214,7 +265,7 @@ export default function WhiteboardPage() {
 
   const [opacities, setOpacities] = useState<Record<number, number>>({});
   useEffect(() => {
-    if (isTdah) return; // TDAH : pas d'atténuation des messages (évite la distraction)
+    if (isTdah) return;
     const interval = setInterval(() => {
       setOpacities(() => {
         const next: Record<number, number> = {};
@@ -230,6 +281,8 @@ export default function WhiteboardPage() {
     return () => clearInterval(interval);
   }, [messages, hoveredMsgIdx, isTdah]);
 
+  const assistantMessageCount = messages.filter((m) => m.role === "assistant").length;
+
   async function askAI() {
     if (!question.trim() && !imageFile) return;
     const userQuestion = question.trim() || "Analyse cette photo de devoir, identifie chaque exercice et propose comment le faire étape par étape sans donner les réponses.";
@@ -237,7 +290,7 @@ export default function WhiteboardPage() {
     setIsLoading(true);
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 35000); // 35s max
+      const timeoutId = setTimeout(() => controller.abort(), 35000);
       let imageDataUrl: string | null = null;
       if (imageFile) {
         try { imageDataUrl = await readFileAsDataURL(imageFile); } catch (err) { console.error("Erreur de lecture de l'image:", err); }
@@ -262,13 +315,15 @@ export default function WhiteboardPage() {
         const newAssistantMessages: ChatMessage[] = bubbles.map((bulle) => ({
           role: "assistant" as const,
           content: bulle.trim(),
-          segments: data.segments, // tous les messages partagent les mêmes segments
+          segments: data.segments,
           timestamp: new Date(),
         }));
         setMessages((prev) => [...prev, ...newAssistantMessages]);
         if (data.encouragement) {
           setMessages((prev) => [...prev, { role: "assistant", content: `✨ ${data.encouragement}`, timestamp: new Date() }]);
         }
+        // Award 10 XP for each successful AI response
+        awardXP(10);
       } else {
         await res.json().catch(() => ({}));
         setMessages((prev) => [...prev, { role: "assistant", content: "Désolé, une erreur est survenue. Réessaie !", timestamp: new Date() }]);
@@ -287,11 +342,37 @@ export default function WhiteboardPage() {
     }
   }
 
-  // Layout TDAH : épuré, sans animations, fond statique (recommandations HAS / a11y)
-  // Layout standard : moderne avec animations smooth
+  const mascotData = mascot ? MASCOTTES.find((m) => m.id === mascot) : null;
+
+  // Theme background: gradients for standard, solid colors for TDAH
+  const themeGradient =
+    theme === "space" ? "linear-gradient(135deg, #0a0118 0%, #1a0a3e 40%, #0d0820 100%)" :
+    theme === "ocean" ? "linear-gradient(135deg, #0c1f3f 0%, #0e4060 40%, #0a1a30 100%)" :
+    theme === "forest" ? "linear-gradient(135deg, #0a1f0a 0%, #0f3320 40%, #082010 100%)" :
+    "linear-gradient(135deg, #0f1624 0%, #1a2744 20%, #1e3a5f 40%, #162d4a 60%, #0f1a2e 80%, #0f1624 100%)";
+
+  const tdahBg =
+    theme === "space" ? "#0d0820" :
+    theme === "ocean" ? "#0c1a30" :
+    theme === "forest" ? "#0a170a" :
+    "#0d1117";
+
   return (
-    <div className={`relative flex h-full min-h-0 flex-col overflow-hidden ${isTdah ? "bg-[#0d1117]" : ""}`}>
-      {/* Tooltip global fixed — au-dessus de tout, jamais débordant */}
+    <div
+      className="isolate relative flex h-full min-h-0 flex-col overflow-hidden"
+      style={isTdah ? { backgroundColor: tdahBg } : undefined}
+      data-theme={theme}
+    >
+      {/* Mascot Picker Modal */}
+      {showMascotPicker && (
+        <MascotPicker
+          currentMascot={mascot}
+          onSelect={(m) => setMascot(m)}
+          onClose={() => setShowMascotPicker(false)}
+        />
+      )}
+
+      {/* Tooltip global fixed */}
       {tooltip && (
         <div
           className="pointer-events-none fixed z-[9999] whitespace-normal rounded-2xl bg-neutral-950 px-4 py-3 text-sm font-normal leading-relaxed text-white shadow-2xl ring-1 ring-white/15 transition-opacity duration-150"
@@ -310,28 +391,72 @@ export default function WhiteboardPage() {
           )}
         </div>
       )}
+
+      {/* Background gradient */}
       {!isTdah && (
-        <div className="absolute inset-0 -z-10 bg-[length:200%_200%]" style={{ backgroundImage: "linear-gradient(135deg, #0f1624 0%, #1a2744 20%, #1e3a5f 40%, #162d4a 60%, #0f1a2e 80%, #0f1624 100%)", backgroundPosition: "0% 50%", animation: "gradient-drift 45s ease-in-out infinite" }} />
+        <div
+          className="absolute inset-0 -z-10"
+          style={{
+            background: themeGradient,
+            backgroundSize: theme === "classic" ? "200% 200%" : "100% 100%",
+            animation: theme === "classic" ? "gradient-drift 45s ease-in-out infinite" : "none",
+          }}
+        />
       )}
+
+      {/* Top area: mascot OR animated bubble */}
       {!isTdah && (
-        <div className="flex flex-shrink-0 justify-center pt-4 pb-2">
-          <div className={`h-12 w-12 rounded-full border-2 border-blue-500/60 bg-blue-500/20 transition-all duration-300 ${aiSpeaking ? "animate-[voice-pulse-active_1.2s_ease-in-out_infinite]" : "animate-[voice-pulse_3s_ease-in-out_infinite]"}`} />
+        <div className="flex flex-shrink-0 items-center pt-4 pb-2 px-5 sm:px-10">
+          <div className="flex items-center gap-3">
+            {mascotData ? (
+              <button
+                onClick={() => setShowMascotPicker(true)}
+                className="group flex items-center gap-2"
+                title="Changer de mascotte"
+              >
+                <span
+                  className="text-4xl"
+                  style={{ animation: "mascot-float 3s ease-in-out infinite", display: "block" }}
+                >
+                  {mascotData.emoji}
+                </span>
+                {mascotPhrase && (
+                  <span className="hidden max-w-xs text-xs italic text-white/40 sm:block">&ldquo;{mascotPhrase}&rdquo;</span>
+                )}
+              </button>
+            ) : (
+              <button
+                onClick={() => setShowMascotPicker(true)}
+                className="h-12 w-12 rounded-full border-2 border-blue-500/60 bg-blue-500/20 transition-all duration-300 hover:border-blue-400 hover:bg-blue-500/30"
+                style={{ animation: aiSpeaking ? "voice-pulse-active 1.2s ease-in-out infinite" : "voice-pulse 3s ease-in-out infinite" }}
+                title="Choisir une mascotte"
+              />
+            )}
+          </div>
         </div>
       )}
+
+      {/* TDAH top: simple greeting */}
+      {isTdah && showWelcome && (
+        <div className="flex flex-shrink-0 items-center py-3 px-5">
+          <p className="text-lg font-medium text-white/95">Bonjour {childName || "toi"}.</p>
+        </div>
+      )}
+
       {showWelcome && !isTdah && (
         <div className={`pointer-events-none absolute inset-0 z-20 flex items-center justify-center ${welcomeDone ? "animate-[welcome-out_0.4s_ease-out_forwards]" : "animate-[welcome-in_0.6s_ease-out_forwards]"}`}>
           <div className={`flex flex-col items-center justify-center gap-4 ${welcomeDone ? "opacity-0" : ""}`} style={{ transition: "opacity 0.4s" }}>
-            <div className={`h-20 w-20 rounded-full border-2 border-blue-500/60 bg-blue-500/20 ${welcomeDone ? "" : "animate-[voice-pulse_0.8s_ease-in-out_infinite]"}`} />
+            {mascotData ? (
+              <span className="text-6xl" style={{ animation: "mascot-float 2s ease-in-out infinite" }}>{mascotData.emoji}</span>
+            ) : (
+              <div className={`h-20 w-20 rounded-full border-2 border-blue-500/60 bg-blue-500/20 ${welcomeDone ? "" : "animate-[voice-pulse_0.8s_ease-in-out_infinite]"}`} />
+            )}
             <p className="text-xl font-medium text-white/95">Bonjour {childName || "toi"} ! 👋</p>
             <p className="text-sm text-white/60">Je suis là pour t&apos;aider.</p>
           </div>
         </div>
       )}
-      {showWelcome && isTdah && (
-        <div className="flex flex-shrink-0 justify-center py-4">
-          <p className="text-lg font-medium text-white/95">Bonjour {childName || "toi"}.</p>
-        </div>
-      )}
+
       <main className="min-h-0 flex-1 overflow-y-auto px-5 py-4 sm:px-10">
         <div className="mx-auto flex max-w-3xl flex-col">
           <div className="space-y-4">
@@ -369,6 +494,7 @@ export default function WhiteboardPage() {
           </div>
         </div>
       </main>
+
       <footer className={`flex-shrink-0 border-t px-5 py-4 sm:px-10 ${isTdah ? "border-neutral-700 bg-neutral-900/80" : "border-white/10 bg-black/20 backdrop-blur-sm"}`}>
         <div className="mx-auto flex max-w-3xl flex-col gap-3">
           <div className="flex items-center gap-3">
@@ -391,6 +517,15 @@ export default function WhiteboardPage() {
           <input id="homework-image-input" type="file" accept="image/*" className="hidden" onChange={(e) => { const file = e.target.files?.[0]; if (!file) { setImageFile(null); setImagePreview(null); return; } setImageFile(file); setImagePreview(URL.createObjectURL(file)); }} />
         </div>
       </footer>
+
+      {/* Customization side drawer (Pomodoro, Theme, Ambient, Mascot) */}
+      <CustomizationDrawer
+        isTdah={isTdah}
+        mascot={mascot}
+        onOpenMascotPicker={() => setShowMascotPicker(true)}
+        questionCount={assistantMessageCount}
+        onPomodoroComplete={(minutes) => { void minutes; awardXP(50); }}
+      />
     </div>
   );
 }

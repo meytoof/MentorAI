@@ -10,9 +10,11 @@ interface DashboardNavProps {
     email?: string | null;
     image?: string | null;
   };
+  xp?: number;
+  streak?: number;
 }
 
-export default function DashboardNav({ user }: DashboardNavProps) {
+export default function DashboardNav({ user, xp = 0, streak = 0 }: DashboardNavProps) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -31,6 +33,20 @@ export default function DashboardNav({ user }: DashboardNavProps) {
       <Link href="/dashboard/whiteboard" className="text-base font-semibold text-white/90 hover:text-white">
         MentorIA
       </Link>
+
+      {/* Badge XP + Streak centré */}
+      <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-3 text-sm">
+        {streak > 0 && (
+          <span className="flex items-center gap-1 rounded-full border border-orange-500/30 bg-orange-500/10 px-2.5 py-1 text-orange-300">
+            🔥 <span className="font-semibold">{streak}j</span>
+          </span>
+        )}
+        {xp > 0 && (
+          <span className="flex items-center gap-1 rounded-full border border-amber-500/30 bg-amber-500/10 px-2.5 py-1 text-amber-300">
+            ⭐ <span className="font-semibold">{xp} XP</span>
+          </span>
+        )}
+      </div>
 
       <div ref={ref} className="relative">
         <button

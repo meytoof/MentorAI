@@ -5,6 +5,23 @@ import { getServerSession } from "next-auth";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import StripePortalButton from "./StripePortalButton";
+import TdahToggle from "./TdahToggle";
+
+const SUBJECT_KEYWORDS: Record<string, string[]> = {
+  "Mathématiques": ["math", "calcul", "fraction", "nombre", "géométrie", "addition", "soustraction", "multiplication", "division", "problème", "mesure"],
+  "Français": ["grammaire", "conjugaison", "orthographe", "verbe", "nom", "adjectif", "phrase", "lecture", "texte", "dictée", "écriture"],
+  "Sciences": ["science", "nature", "animal", "plante", "corps", "physique", "chimie", "expérience", "matière", "énergie"],
+  "Histoire-Géo": ["histoire", "géographie", "carte", "pays", "époque", "siècle", "roi", "guerre", "civilisation", "continent"],
+  "Anglais": ["anglais", "english", "traduction", "vocabulaire", "verbe anglais", "grammaire anglaise"],
+};
+
+function detectSubject(text: string): string {
+  const lower = text.toLowerCase();
+  for (const [subject, keywords] of Object.entries(SUBJECT_KEYWORDS)) {
+    if (keywords.some((kw) => lower.includes(kw))) return subject;
+  }
+  return "Autre";
+}
 
 export default async function ComptePage() {
   const session = await getServerSession(authOptions);
@@ -14,8 +31,9 @@ export default async function ComptePage() {
   const user = await prisma.user.findUnique({
     where: { id: userId },
     select: {
-      email: true, name: true, trialEndsAt: true, createdAt: true,
+      email: true, name: true, trialEndsAt: true, createdAt: true, isTdah: true,
       stripeCurrentPeriodEnd: true, isLifetime: true, stripeCustomerId: true, stripePriceId: true,
+      xp: true, streak: true, lastSessionAt: true,
     },
   });
 
@@ -26,6 +44,33 @@ export default async function ComptePage() {
   const hasSubscription = !!user.stripeCurrentPeriodEnd && user.stripeCurrentPeriodEnd > new Date();
   const trialEndsAtFormatted = user.trialEndsAt.toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
   const subEndsFormatted = user.stripeCurrentPeriodEnd?.toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
+
+  // Conversations des 7 derniers jours
+  const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+  const recentConversations = await prisma.conversation.findMany({
+    where: { userId, createdAt: { gte: sevenDaysAgo } },
+    select: { question: true, createdAt: true },
+    orderBy: { createdAt: "desc" },
+  });
+
+  const totalConversations = await prisma.conversation.count({ where: { userId } });
+
+  // Dates uniques d'activité (7 derniers jours)
+  const activeDays = [...new Set(recentConversations.map((c) => c.createdAt.toLocaleDateString("fr-FR", { day: "numeric", month: "short" })))];
+
+  // Top 5 matières
+  const subjectCounts: Record<string, number> = {};
+  recentConversations.forEach((c) => {
+    const subject = detectSubject(c.question);
+    subjectCounts[subject] = (subjectCounts[subject] ?? 0) + 1;
+  });
+  const topSubjects = Object.entries(subjectCounts)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5);
+
+  const lastSessionFormatted = user.lastSessionAt
+    ? user.lastSessionAt.toLocaleDateString("fr-FR", { day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" })
+    : null;
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-10 sm:px-6">
@@ -44,6 +89,9 @@ export default async function ComptePage() {
               <dd className="font-medium text-white">{user.createdAt.toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })}</dd>
             </div>
           </dl>
+          <div className="mt-5 border-t border-white/10 pt-5">
+            <TdahToggle initialValue={user.isTdah} />
+          </div>
         </section>
 
         {/* Abonnement */}
@@ -89,6 +137,67 @@ export default async function ComptePage() {
                 Voir les offres →
               </Link>
             </div>
+          )}
+        </section>
+
+        {/* Suivi de l'enfant */}
+        <section className="rounded-xl border border-white/10 bg-white/5 p-6">
+          <h2 className="mb-4 text-lg font-medium text-white">Suivi de l&apos;enfant</h2>
+
+          {/* Stat cards */}
+          <div className="mb-5 grid grid-cols-3 gap-3">
+            <div className="rounded-xl border border-orange-500/20 bg-orange-500/10 p-4 text-center">
+              <p className="text-2xl font-bold text-orange-300">🔥 {user.streak}</p>
+              <p className="mt-1 text-xs text-white/50">Jours consécutifs</p>
+            </div>
+            <div className="rounded-xl border border-amber-500/20 bg-amber-500/10 p-4 text-center">
+              <p className="text-2xl font-bold text-amber-300">⭐ {user.xp}</p>
+              <p className="mt-1 text-xs text-white/50">Points XP totaux</p>
+            </div>
+            <div className="rounded-xl border border-blue-500/20 bg-blue-500/10 p-4 text-center">
+              <p className="text-2xl font-bold text-blue-300">{totalConversations}</p>
+              <p className="mt-1 text-xs text-white/50">Questions posées</p>
+            </div>
+          </div>
+
+          {/* Activité 7 derniers jours */}
+          {activeDays.length > 0 && (
+            <div className="mb-5">
+              <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-white/40">Activité (7 derniers jours)</p>
+              <div className="flex flex-wrap gap-2">
+                {activeDays.map((day) => (
+                  <span key={day} className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/70">
+                    {day}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Matières abordées */}
+          {topSubjects.length > 0 && (
+            <div className="mb-5">
+              <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-white/40">Matières abordées récemment</p>
+              <div className="space-y-2">
+                {topSubjects.map(([subject, count]) => (
+                  <div key={subject} className="flex items-center justify-between text-sm">
+                    <span className="text-white/80">{subject}</span>
+                    <span className="rounded-full bg-white/10 px-2 py-0.5 text-xs text-white/50">{count} question{count > 1 ? "s" : ""}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Dernière session */}
+          {lastSessionFormatted && (
+            <p className="text-xs text-white/40">
+              Dernière session : <span className="text-white/60">{lastSessionFormatted}</span>
+            </p>
+          )}
+
+          {totalConversations === 0 && (
+            <p className="text-sm text-white/40 italic">Aucune activité encore. Commencez à utiliser MentorIA !</p>
           )}
         </section>
       </div>
