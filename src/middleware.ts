@@ -2,7 +2,7 @@ import { getToken } from "next-auth/jwt";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
-const PROTECTED_PREFIXES = ["/dashboard"]; // prot e9ger le tableau et pages futures
+const PROTECTED_PREFIXES = ["/dashboard", "/onboarding", "/admin"];
 
 export async function middleware(req: NextRequest) {
 	const { pathname } = req.nextUrl;
@@ -21,5 +21,5 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-	matcher: ["/dashboard/:path*"],
+	matcher: ["/dashboard/:path*", "/onboarding", "/admin/:path*"],
 };
