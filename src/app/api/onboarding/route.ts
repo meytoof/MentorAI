@@ -4,13 +4,16 @@ import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
+const freeText = z.string().min(10).max(1000);
+
 const schema = z.object({
   childAge: z.number().int().min(6).max(15),
   schoolLevel: z.enum(["CP", "CE1", "CE2", "CM1", "CM2", "6e"]),
   hasRedoublement: z.boolean(),
-  mentoriaReason: z.enum(["difficulties", "time", "tdah", "curiosity"]),
-  difficultSubjects: z.array(z.string()).min(1).max(6),
-  learningObjective: z.enum(["catchup", "maintain", "advance"]),
+  childContext: freeText,
+  mentoriaReason: freeText,
+  difficultSubjects: freeText,
+  learningObjective: freeText,
 });
 
 export async function POST(req: Request) {
@@ -26,7 +29,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Données invalides", details: parsed.error.flatten() }, { status: 400 });
   }
 
-  const { childAge, schoolLevel, hasRedoublement, mentoriaReason, difficultSubjects, learningObjective } = parsed.data;
+  const { childAge, schoolLevel, hasRedoublement, childContext, mentoriaReason, difficultSubjects, learningObjective } = parsed.data;
 
   await prisma.user.update({
     where: { id: userId },
@@ -34,8 +37,9 @@ export async function POST(req: Request) {
       childAge,
       schoolLevel,
       hasRedoublement,
+      childContext,
       mentoriaReason,
-      difficultSubjects: JSON.stringify(difficultSubjects),
+      difficultSubjects,
       learningObjective,
       onboardingDone: true,
     },

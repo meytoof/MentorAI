@@ -35,7 +35,7 @@ export async function POST(request: Request) {
 		}
 
 		// Anti-abuse : 1 signup par IP tous les 7 jours (évite de recréer des comptes pour l'essai)
-		if (clientIp !== "unknown") {
+		if (process.env.NODE_ENV !== "development" && clientIp !== "unknown") {
 			const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
 			const existingIp = await prisma.signupFromIp.findUnique({
 				where: { ip: clientIp },

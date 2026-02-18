@@ -7,26 +7,27 @@ import { useState } from "react";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
-type Step = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
+type Step = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
 
 interface OnboardingState {
   childAge: number | null;
   schoolLevel: string | null;
   hasRedoublement: boolean | null;
-  mentoriaReason: string | null;
-  difficultSubjects: string[];
-  learningObjective: string | null;
+  childContext: string;
+  mentoriaReason: string;
+  difficultSubjects: string;
+  learningObjective: string;
 }
 
-// ─── Slide variants ───────────────────────────────────────────────────────────
+// ─── Constants ───────────────────────────────────────────────────────────────
+
+const TOTAL_STEPS = 7; // steps 1–7
 
 const slideVariants = {
   enter: (d: number) => ({ x: d * 60, opacity: 0 }),
   center: { x: 0, opacity: 1 },
   exit: (d: number) => ({ x: d * -60, opacity: 0 }),
 };
-
-// ─── Env tips (step 7) ────────────────────────────────────────────────────────
 
 const ENV_TIPS = [
   { icon: "🔇", title: "Endroit calme", desc: "Éloigner les sources de bruit (TV, fratrie)" },
@@ -38,9 +39,47 @@ const ENV_TIPS = [
 
 const CELEBRATE_ITEMS = [
   { icon: "✨", label: "Profil personnalisé" },
-  { icon: "🧠", label: "IA adaptée à ton enfant" },
-  { icon: "🚀", label: "Prêt à apprendre" },
+  { icon: "🧠", label: "IA adaptée à votre enfant" },
+  { icon: "🚀", label: "Prêt à apprendre ensemble" },
 ];
+
+const MIN_CHARS = 15;
+
+// ─── TextArea Field ───────────────────────────────────────────────────────────
+
+function RichTextarea({
+  value,
+  onChange,
+  placeholder,
+  maxLength = 800,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  placeholder: string;
+  maxLength?: number;
+}) {
+  const remaining = value.trim().length;
+  const ready = remaining >= MIN_CHARS;
+
+  return (
+    <div>
+      <textarea
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        maxLength={maxLength}
+        rows={6}
+        className="w-full resize-none rounded-2xl border border-white/10 bg-white/5 p-4 text-sm leading-relaxed text-white placeholder-white/25 transition focus:border-blue-500/60 focus:outline-none focus:ring-1 focus:ring-blue-500/30"
+      />
+      <div className="mt-2 flex items-center justify-between text-xs">
+        <span className={ready ? "text-emerald-400" : "text-white/30"}>
+          {ready ? "✓ Super !" : `Encore ${MIN_CHARS - remaining} caractères min.`}
+        </span>
+        <span className="text-white/20">{value.length} / {maxLength}</span>
+      </div>
+    </div>
+  );
+}
 
 // ─── StepShell ────────────────────────────────────────────────────────────────
 
@@ -65,16 +104,14 @@ function StepShell({
   isLoading?: boolean;
   nextLabel?: string;
 }) {
-  const totalSteps = 6;
-  const progress = ((step - 1) / totalSteps) * 100;
+  const progress = ((step - 1) / TOTAL_STEPS) * 100;
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center px-4 py-10">
-      {/* Progress bar */}
-      {step >= 1 && step <= 6 && (
+      {step >= 1 && step <= TOTAL_STEPS && (
         <div className="mb-8 w-full max-w-lg">
           <div className="mb-2 flex justify-between text-xs text-white/40">
-            <span>Étape {step} / {totalSteps}</span>
+            <span>Étape {step} / {TOTAL_STEPS}</span>
             <span>{Math.round(progress)}%</span>
           </div>
           <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/10">
@@ -130,27 +167,22 @@ export default function OnboardingPage() {
     childAge: null,
     schoolLevel: null,
     hasRedoublement: null,
-    mentoriaReason: null,
-    difficultSubjects: [],
-    learningObjective: null,
+    childContext: "",
+    mentoriaReason: "",
+    difficultSubjects: "",
+    learningObjective: "",
   });
 
-  const firstName = (session?.user as { name?: string })?.name?.split(" ")[0] ?? "toi";
+  const firstName = (session?.user as { name?: string })?.name?.split(" ")[0] ?? "vous";
 
   function goTo(next: Step) {
     setDirection(next > step ? 1 : -1);
     setStep(next);
   }
-
-  function next() {
-    goTo((step + 1) as Step);
-  }
-  function back() {
-    goTo((step - 1) as Step);
-  }
+  function next() { goTo((step + 1) as Step); }
+  function back() { goTo((step - 1) as Step); }
 
   async function handleFinish() {
-    if (!state.childAge || !state.schoolLevel || state.hasRedoublement === null || !state.mentoriaReason || state.difficultSubjects.length === 0 || !state.learningObjective) return;
     setIsLoading(true);
     setError(null);
     try {
@@ -161,15 +193,16 @@ export default function OnboardingPage() {
           childAge: state.childAge,
           schoolLevel: state.schoolLevel,
           hasRedoublement: state.hasRedoublement,
+          childContext: state.childContext,
           mentoriaReason: state.mentoriaReason,
           difficultSubjects: state.difficultSubjects,
           learningObjective: state.learningObjective,
         }),
       });
       if (!res.ok) throw new Error("Erreur serveur");
-      goTo(7);
+      goTo(8);
     } catch {
-      setError("Une erreur est survenue. Réessaie.");
+      setError("Une erreur est survenue. Réessayez.");
     } finally {
       setIsLoading(false);
     }
@@ -177,18 +210,6 @@ export default function OnboardingPage() {
 
   const ages = Array.from({ length: 10 }, (_, i) => i + 6);
   const levels = ["CP", "CE1", "CE2", "CM1", "CM2", "6e"];
-  const reasons = [
-    { value: "difficulties", label: "Difficultés scolaires", icon: "📚" },
-    { value: "time", label: "Manque de temps parental", icon: "⏰" },
-    { value: "tdah", label: "Profil TDAH / neuro-atypique", icon: "🧩" },
-    { value: "curiosity", label: "Curiosité & enrichissement", icon: "🔭" },
-  ];
-  const subjects = ["Maths", "Français", "Anglais", "Sciences", "Hist-Géo", "Autre"];
-  const objectives = [
-    { value: "catchup", label: "Rattrapage", icon: "📈", desc: "Combler les lacunes" },
-    { value: "maintain", label: "Maintien", icon: "⚖️", desc: "Rester au niveau" },
-    { value: "advance", label: "Avance", icon: "🚀", desc: "Prendre de l'avance" },
-  ];
 
   return (
     <div className="overflow-hidden">
@@ -202,7 +223,8 @@ export default function OnboardingPage() {
           exit="exit"
           transition={{ duration: 0.3, ease: "easeInOut" }}
         >
-          {/* ── Step 0 : Welcome ── */}
+
+          {/* ── Step 0 : Bienvenue ── */}
           {step === 0 && (
             <div className="flex min-h-screen flex-col items-center justify-center px-4 py-10 text-center">
               <motion.div
@@ -227,7 +249,7 @@ export default function OnboardingPage() {
                 transition={{ delay: 0.25, duration: 0.4 }}
                 className="mb-10 max-w-sm text-white/50"
               >
-                Prenons 2 minutes pour personnaliser l&apos;expérience de MentorIA selon le profil de votre enfant.
+                Prenons 2 minutes pour personnaliser MentorIA selon le profil unique de votre enfant.
               </motion.p>
               <motion.button
                 initial={{ y: 20, opacity: 0 }}
@@ -246,7 +268,7 @@ export default function OnboardingPage() {
             <StepShell
               step={step}
               title="Quel âge a votre enfant ?"
-              subtitle="Nous adaptons le niveau de langage et les explications."
+              subtitle="Nous adaptons le vocabulaire et le rythme d'apprentissage."
               canNext={state.childAge !== null}
               onNext={next}
               onBack={back}
@@ -274,7 +296,7 @@ export default function OnboardingPage() {
             <StepShell
               step={step}
               title="Quel est son niveau scolaire ?"
-              subtitle="Pour adapter les exercices et les explications."
+              subtitle="Pour calibrer les exercices proposés."
               canNext={state.schoolLevel !== null}
               onNext={next}
               onBack={back}
@@ -301,8 +323,8 @@ export default function OnboardingPage() {
           {step === 3 && (
             <StepShell
               step={step}
-              title="A-t-il / elle redoublé ?"
-              subtitle="Cette information nous aide à calibrer le rythme."
+              title="A-t-il / elle déjà redoublé ?"
+              subtitle="Cela nous aide à calibrer le niveau de départ."
               canNext={state.hasRedoublement !== null}
               onNext={next}
               onBack={back}
@@ -329,114 +351,89 @@ export default function OnboardingPage() {
             </StepShell>
           )}
 
-          {/* ── Step 4 : Raison ── */}
+          {/* ── Step 4 : Contexte général ── */}
           {step === 4 && (
             <StepShell
               step={step}
-              title="Pourquoi MentorIA ?"
-              subtitle="Pour mieux cibler notre approche pédagogique."
-              canNext={state.mentoriaReason !== null}
+              title="Parlez-nous de votre enfant"
+              subtitle="Comment le décririez-vous ? Son caractère, sa façon d'apprendre, ses points forts..."
+              canNext={state.childContext.trim().length >= MIN_CHARS}
               onNext={next}
               onBack={back}
             >
-              <div className="grid grid-cols-2 gap-3">
-                {reasons.map((r) => (
-                  <button
-                    key={r.value}
-                    onClick={() => setState((s) => ({ ...s, mentoriaReason: r.value }))}
-                    className={`flex flex-col items-center gap-2 rounded-xl border p-4 text-sm font-medium transition ${
-                      state.mentoriaReason === r.value
-                        ? "border-blue-500 bg-blue-600 text-white"
-                        : "border-white/10 bg-white/5 text-white/60 hover:border-white/30"
-                    }`}
-                  >
-                    <span className="text-2xl">{r.icon}</span>
-                    <span className="text-center leading-snug">{r.label}</span>
-                  </button>
-                ))}
-              </div>
+              <RichTextarea
+                value={state.childContext}
+                onChange={(v) => setState((s) => ({ ...s, childContext: v }))}
+                placeholder="Ex : Ma fille a 9 ans, elle est en CE2. Très créative et curieuse, elle se décourage vite quand un exercice lui résiste. Elle adore les histoires et apprend mieux avec des exemples concrets. Elle peut être distraite mais s'investit vraiment quand elle se sent en confiance..."
+              />
             </StepShell>
           )}
 
-          {/* ── Step 5 : Matières difficiles ── */}
+          {/* ── Step 5 : Pourquoi MentorIA ── */}
           {step === 5 && (
             <StepShell
               step={step}
-              title="Matières les plus difficiles ?"
-              subtitle="Sélectionne une ou plusieurs matières."
-              canNext={state.difficultSubjects.length > 0}
+              title="Pourquoi avez-vous choisi MentorIA ?"
+              subtitle="Décrivez librement la situation et ce qui vous a amené ici."
+              canNext={state.mentoriaReason.trim().length >= MIN_CHARS}
               onNext={next}
               onBack={back}
             >
-              <div className="grid grid-cols-2 gap-3">
-                {subjects.map((s) => {
-                  const selected = state.difficultSubjects.includes(s);
-                  return (
-                    <button
-                      key={s}
-                      onClick={() =>
-                        setState((prev) => ({
-                          ...prev,
-                          difficultSubjects: selected
-                            ? prev.difficultSubjects.filter((x) => x !== s)
-                            : [...prev.difficultSubjects, s],
-                        }))
-                      }
-                      className={`rounded-xl border py-3 text-sm font-medium transition ${
-                        selected
-                          ? "border-blue-500 bg-blue-600 text-white"
-                          : "border-white/10 bg-white/5 text-white/60 hover:border-white/30"
-                      }`}
-                    >
-                      {s}
-                    </button>
-                  );
-                })}
-              </div>
+              <RichTextarea
+                value={state.mentoriaReason}
+                onChange={(v) => setState((s) => ({ ...s, mentoriaReason: v }))}
+                placeholder="Ex : Mon fils peine en maths depuis le CE1 et les devoirs sont souvent source de tension à la maison. Je travaille jusqu'à 19h et je n'ai pas toujours le temps de l'accompagner. J'aimerais qu'il gagne en autonomie et reprenne confiance en lui..."
+              />
             </StepShell>
           )}
 
-          {/* ── Step 6 : Objectif ── */}
+          {/* ── Step 6 : Difficultés ── */}
           {step === 6 && (
             <StepShell
               step={step}
-              title="Quel est votre objectif ?"
-              subtitle="On adapte la progression et le ton de MentorIA."
-              canNext={state.learningObjective !== null}
+              title="Quelles sont ses principales difficultés ?"
+              subtitle="Matières, types d'exercices, situations particulières... soyez précis, c'est ce qui rend MentorIA vraiment utile."
+              canNext={state.difficultSubjects.trim().length >= MIN_CHARS}
+              onNext={next}
+              onBack={back}
+            >
+              <RichTextarea
+                value={state.difficultSubjects}
+                onChange={(v) => setState((s) => ({ ...s, difficultSubjects: v }))}
+                placeholder="Ex : Surtout en maths (les fractions et la géométrie) et en orthographe. Il comprend bien à l'oral mais dès qu'il faut écrire ou poser un calcul il se bloque. Les problèmes à plusieurs étapes sont particulièrement difficiles pour lui..."
+              />
+            </StepShell>
+          )}
+
+          {/* ── Step 7 : Objectif ── */}
+          {step === 7 && (
+            <StepShell
+              step={step}
+              title="Qu'espérez-vous accomplir ensemble ?"
+              subtitle="Votre objectif guide la progression et le ton de MentorIA."
+              canNext={state.learningObjective.trim().length >= MIN_CHARS}
               onNext={handleFinish}
               onBack={back}
               isLoading={isLoading}
               nextLabel="Terminer →"
             >
-              <div className="flex flex-col gap-3">
+              <>
                 {error && (
-                  <div className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400">
+                  <div className="mb-4 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400">
                     {error}
                   </div>
                 )}
-                {objectives.map((o) => (
-                  <button
-                    key={o.value}
-                    onClick={() => setState((s) => ({ ...s, learningObjective: o.value }))}
-                    className={`flex items-center gap-4 rounded-xl border p-4 text-left transition ${
-                      state.learningObjective === o.value
-                        ? "border-blue-500 bg-blue-600 text-white"
-                        : "border-white/10 bg-white/5 text-white/60 hover:border-white/30"
-                    }`}
-                  >
-                    <span className="text-2xl">{o.icon}</span>
-                    <div>
-                      <div className="font-semibold">{o.label}</div>
-                      <div className="text-xs opacity-70">{o.desc}</div>
-                    </div>
-                  </button>
-                ))}
-              </div>
+                <RichTextarea
+                  value={state.learningObjective}
+                  onChange={(v) => setState((s) => ({ ...s, learningObjective: v }))}
+                  placeholder="Ex : J'aimerais qu'il rattrape son retard en maths avant la fin du trimestre et surtout qu'il retrouve le goût d'apprendre. À terme, l'idéal serait qu'il soit capable de faire ses devoirs seul et de poser des questions sans avoir honte de ne pas comprendre..."
+                />
+              </>
             </StepShell>
           )}
 
-          {/* ── Step 7 : Préparation de l'environnement ── */}
-          {step === 7 && (
+          {/* ── Step 8 : Préparation de l'environnement ── */}
+          {step === 8 && (
             <div className="flex min-h-screen flex-col items-center justify-center px-4 py-10">
               <div className="w-full max-w-lg">
                 <motion.div
@@ -478,7 +475,7 @@ export default function OnboardingPage() {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.6, duration: 0.4 }}
-                  onClick={() => goTo(8)}
+                  onClick={() => goTo(9)}
                   className="w-full rounded-xl bg-blue-600 py-3 text-sm font-semibold text-white transition hover:bg-blue-500"
                 >
                   Prêt, on y va ! →
@@ -487,8 +484,8 @@ export default function OnboardingPage() {
             </div>
           )}
 
-          {/* ── Step 8 : Célébration ── */}
-          {step === 8 && (
+          {/* ── Step 9 : Célébration ── */}
+          {step === 9 && (
             <div className="flex min-h-screen flex-col items-center justify-center px-4 py-10 text-center">
               <motion.div
                 initial={{ scale: 0.5, opacity: 0 }}
@@ -515,7 +512,7 @@ export default function OnboardingPage() {
                 MentorIA est configuré pour accompagner votre enfant.
               </motion.p>
 
-              <div className="mb-8 flex flex-col gap-3 w-full max-w-xs">
+              <div className="mb-8 flex w-full max-w-xs flex-col gap-3">
                 {CELEBRATE_ITEMS.map((item, i) => (
                   <motion.div
                     key={item.label}
@@ -541,6 +538,7 @@ export default function OnboardingPage() {
               </motion.button>
             </div>
           )}
+
         </motion.div>
       </AnimatePresence>
     </div>

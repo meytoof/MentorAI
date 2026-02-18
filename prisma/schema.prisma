@@ -25,9 +25,10 @@ model User {
   childAge             Int?
   schoolLevel          String?       // "CP"|"CE1"|"CE2"|"CM1"|"CM2"|"6e"
   hasRedoublement      Boolean?
-  mentoriaReason       String?       // "difficulties"|"time"|"tdah"|"curiosity"
-  difficultSubjects    String?       // JSON stringifié ex: '["Maths","Français"]'
-  learningObjective    String?       // "catchup"|"maintain"|"advance"
+  childContext         String?       // Texte libre : description générale de l'enfant par le parent
+  mentoriaReason       String?       // Texte libre : pourquoi MentorIA
+  difficultSubjects    String?       // Texte libre : matières/difficultés décrites par le parent
+  learningObjective    String?       // Texte libre : objectif pédagogique
   isAdmin              Boolean       @default(false)
   createdAt            DateTime      @default(now())
   updatedAt            DateTime      @updatedAt

@@ -22,7 +22,8 @@ export default function Footer() {
             </div>
             <p className="mb-4 max-w-md text-sm text-neutral-400">
               L&apos;IA qui aide ton enfant à faire ses devoirs sans jamais donner la réponse.
-              Conçu pour le primaire (CP-CM2) et validé avec des spécialistes TDAH.
+              Adapté aux profils TDAH selon les recommandations de la{" "}
+              <a href="https://www.has-sante.fr/jcms/p_3375491/fr/tdah-de-l-enfant-et-de-l-adolescent" target="_blank" rel="noopener noreferrer" className="underline hover:text-neutral-200">HAS (2023)</a>.
             </p>
           </div>
 
@@ -58,13 +59,13 @@ export default function Footer() {
             <h3 className="mb-4 text-sm font-semibold text-white">Support</h3>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link href="/contact" className="text-neutral-400 hover:text-white transition-colors">
+                <a href="mailto:contact@mentoria.fr" className="text-neutral-400 hover:text-white transition-colors">
                   Contact
-                </Link>
+                </a>
               </li>
               <li>
-                <Link href="/aide" className="text-neutral-400 hover:text-white transition-colors">
-                  Centre d'aide
+                <Link href="/accueil#faq" className="text-neutral-400 hover:text-white transition-colors">
+                  FAQ
                 </Link>
               </li>
               <li>

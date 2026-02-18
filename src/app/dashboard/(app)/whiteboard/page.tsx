@@ -22,6 +22,12 @@ interface ChatMessage {
   imagePreview?: string | null;
 }
 
+interface TooltipState {
+  segment: Segment;
+  x: number;
+  y: number;
+}
+
 export default function WhiteboardPage() {
   const { data: session } = useSession();
   const chatEndRef = useRef<HTMLDivElement | null>(null);
@@ -34,6 +40,7 @@ export default function WhiteboardPage() {
   const [welcomeDone, setWelcomeDone] = useState(false);
   const [aiSpeaking, setAiSpeaking] = useState(false);
   const [hoveredMsgIdx, setHoveredMsgIdx] = useState<number | null>(null);
+  const [tooltip, setTooltip] = useState<TooltipState | null>(null);
 
   const childName = (session?.user as { name?: string } | undefined)?.name ?? "toi";
   const isTdah = (session?.user as { isTdah?: boolean } | undefined)?.isTdah ?? false;
@@ -143,23 +150,28 @@ export default function WhiteboardPage() {
         });
       }
       const mot = match[1].trim();
-      const motNorm = mot.replace(/^(l'|la |le |les |un |une )/i, "").toLowerCase();
+      const normalize = (str: string) =>
+        str.trim().toLowerCase()
+          .replace(/^(l'|la |le |les |un |une |des |du |de la |de l')/i, "")
+          .replace(/[éèêë]/g, "e").replace(/[àâä]/g, "a").replace(/[ùûü]/g, "u")
+          .replace(/[îï]/g, "i").replace(/[ôö]/g, "o").replace(/ç/g, "c").replace(/[^a-z0-9]/g, "");
+      const motN = normalize(mot);
       const segment = segments?.find((s) => {
-        const sNorm = s.text.trim().toLowerCase();
-        return sNorm === motNorm || sNorm === mot.toLowerCase() || motNorm.includes(sNorm) || sNorm.includes(motNorm);
+        const sN = normalize(s.text);
+        return sN === motN || motN.startsWith(sN) || sN.startsWith(motN) || motN.includes(sN) || sN.includes(motN);
       });
-      const tooltipText = segment?.shortTip || segment?.lesson || "Survole pour en savoir plus.";
+      const tooltipText = segment?.shortTip || segment?.lesson || "";
       redParts.push(
-        <span key={`red-${keyCounter++}`} className="group relative inline cursor-help font-semibold text-red-400 underline decoration-red-300/80 decoration-dotted underline-offset-2" title={tooltipText}>
+        <span
+          key={`red-${keyCounter++}`}
+          className={`relative inline-block font-semibold text-red-400 underline decoration-red-300/80 decoration-dotted underline-offset-2 ${segment ? "cursor-help" : ""}`}
+          onMouseEnter={segment ? (e) => {
+            const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+            setTooltip({ segment, x: rect.left + rect.width / 2, y: rect.top });
+          } : undefined}
+          onMouseLeave={segment ? () => setTooltip(null) : undefined}
+        >
           {match[1]}
-          {segment && (
-            <span className="pointer-events-none absolute bottom-full left-1/2 z-50 mb-2 -translate-x-1/2 whitespace-normal rounded-xl bg-neutral-900/95 px-4 py-3 text-base font-normal leading-relaxed text-white opacity-0 shadow-xl ring-1 ring-white/10 transition-opacity duration-200 group-hover:opacity-100" style={{ maxWidth: "340px", minWidth: "200px" }}>
-              <span className="block">{segment.shortTip}</span>
-              {segment.lesson && segment.lesson !== segment.shortTip && (
-                <span className="mt-2 block border-t border-white/20 pt-2 text-base text-white/90">{segment.lesson}</span>
-              )}
-            </span>
-          )}
         </span>
       );
       lastIndex = redRegex.lastIndex;
@@ -225,7 +237,7 @@ export default function WhiteboardPage() {
     setIsLoading(true);
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 200000);
+      const timeoutId = setTimeout(() => controller.abort(), 35000); // 35s max
       let imageDataUrl: string | null = null;
       if (imageFile) {
         try { imageDataUrl = await readFileAsDataURL(imageFile); } catch (err) { console.error("Erreur de lecture de l'image:", err); }
@@ -247,10 +259,10 @@ export default function WhiteboardPage() {
           if (stepMatches?.length) bubbles = stepMatches.map((s) => s.trim()).filter(Boolean);
           else if (msg) bubbles = [msg];
         }
-        const newAssistantMessages: ChatMessage[] = bubbles.map((bulle, i) => ({
+        const newAssistantMessages: ChatMessage[] = bubbles.map((bulle) => ({
           role: "assistant" as const,
           content: bulle.trim(),
-          segments: i === bubbles.length - 1 ? data.segments : undefined,
+          segments: data.segments, // tous les messages partagent les mêmes segments
           timestamp: new Date(),
         }));
         setMessages((prev) => [...prev, ...newAssistantMessages]);
@@ -279,6 +291,25 @@ export default function WhiteboardPage() {
   // Layout standard : moderne avec animations smooth
   return (
     <div className={`relative flex h-full min-h-0 flex-col overflow-hidden ${isTdah ? "bg-[#0d1117]" : ""}`}>
+      {/* Tooltip global fixed — au-dessus de tout, jamais débordant */}
+      {tooltip && (
+        <div
+          className="pointer-events-none fixed z-[9999] whitespace-normal rounded-2xl bg-neutral-950 px-4 py-3 text-sm font-normal leading-relaxed text-white shadow-2xl ring-1 ring-white/15 transition-opacity duration-150"
+          style={{
+            maxWidth: "300px",
+            minWidth: "200px",
+            left: Math.min(tooltip.x, window.innerWidth - 320),
+            top: Math.max(8, tooltip.y - 10),
+            transform: "translate(-50%, -100%)",
+          }}
+        >
+          <span className="mb-2 block text-xs font-bold uppercase tracking-wider text-amber-400">💡 Le saviez-tu ?</span>
+          <span className="block text-white/95">{tooltip.segment.shortTip}</span>
+          {tooltip.segment.lesson && tooltip.segment.lesson !== tooltip.segment.shortTip && (
+            <span className="mt-2 block border-t border-white/15 pt-2 text-xs italic text-white/70">{tooltip.segment.lesson}</span>
+          )}
+        </div>
+      )}
       {!isTdah && (
         <div className="absolute inset-0 -z-10 bg-[length:200%_200%]" style={{ backgroundImage: "linear-gradient(135deg, #0f1624 0%, #1a2744 20%, #1e3a5f 40%, #162d4a 60%, #0f1a2e 80%, #0f1624 100%)", backgroundPosition: "0% 50%", animation: "gradient-drift 45s ease-in-out infinite" }} />
       )}

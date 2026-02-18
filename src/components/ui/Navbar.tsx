@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
+import { useSession, signOut } from "next-auth/react";
 
 import {
   Disclosure,
@@ -26,7 +27,9 @@ function classNames(...classes: Array<string | false | null | undefined>) {
 
 function NavbarContent() {
   const [loginOpen, setLoginOpen] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
   const searchParams = useSearchParams();
+  const { data: session } = useSession();
 
   useEffect(() => {
     if (searchParams.get("login") === "1") setLoginOpen(true);
@@ -62,12 +65,43 @@ function NavbarContent() {
               </div>
             </div>
             <div className="absolute inset-y-0 right-0 flex items-center gap-2 pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
-              <a href="/signup" className="rounded-md bg-blue-500 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-600 transition-colors">
-                Essai gratuit 1 jour
-              </a>
-              <button type="button" onClick={() => setLoginOpen(true)} className="rounded-md px-4 py-2 text-sm font-medium text-gray-300 hover:bg-white/5 hover:text-white transition-colors">
-                Connexion
-              </button>
+              {session ? (
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={() => setUserMenuOpen((v) => !v)}
+                    className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-white/5 hover:text-white transition-colors"
+                  >
+                    <span className="size-7 flex items-center justify-center rounded-full bg-blue-500 text-white font-bold text-xs">
+                      {session.user?.name?.[0]?.toUpperCase() ?? session.user?.email?.[0]?.toUpperCase() ?? "U"}
+                    </span>
+                    <span className="hidden sm:block">{session.user?.name ?? session.user?.email}</span>
+                  </button>
+                  {userMenuOpen && (
+                    <div className="absolute right-0 mt-1 w-44 rounded-md bg-gray-900 border border-white/10 shadow-lg z-50">
+                      <a href="/dashboard" className="block px-4 py-2 text-sm text-gray-300 hover:bg-white/5 hover:text-white">
+                        Mon tableau de bord
+                      </a>
+                      <button
+                        type="button"
+                        onClick={() => signOut({ callbackUrl: "/accueil" })}
+                        className="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-white/5"
+                      >
+                        Se déconnecter
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <>
+                  <a href="/signup" className="rounded-md bg-blue-500 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-600 transition-colors">
+                    Essai gratuit 1 jour
+                  </a>
+                  <button type="button" onClick={() => setLoginOpen(true)} className="rounded-md px-4 py-2 text-sm font-medium text-gray-300 hover:bg-white/5 hover:text-white transition-colors">
+                    Connexion
+                  </button>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -79,10 +113,21 @@ function NavbarContent() {
               </DisclosureButton>
             ))}
             <div className="mt-2 flex gap-2 pt-2 border-t border-white/10">
-              <a href="/signup" className="block flex-1 rounded-md bg-blue-500 px-4 py-2 text-center text-sm font-semibold text-white">Essai gratuit</a>
-              <button type="button" onClick={() => setLoginOpen(true)} className="flex-1 rounded-md border border-white/20 px-4 py-2 text-sm font-medium text-gray-300">
-                Connexion
-              </button>
+              {session ? (
+                <>
+                  <a href="/dashboard" className="block flex-1 rounded-md bg-blue-500 px-4 py-2 text-center text-sm font-semibold text-white">Tableau de bord</a>
+                  <button type="button" onClick={() => signOut({ callbackUrl: "/accueil" })} className="flex-1 rounded-md border border-white/20 px-4 py-2 text-sm font-medium text-red-400">
+                    Se déconnecter
+                  </button>
+                </>
+              ) : (
+                <>
+                  <a href="/signup" className="block flex-1 rounded-md bg-blue-500 px-4 py-2 text-center text-sm font-semibold text-white">Essai gratuit</a>
+                  <button type="button" onClick={() => setLoginOpen(true)} className="flex-1 rounded-md border border-white/20 px-4 py-2 text-sm font-medium text-gray-300">
+                    Connexion
+                  </button>
+                </>
+              )}
             </div>
           </div>
         </DisclosurePanel>

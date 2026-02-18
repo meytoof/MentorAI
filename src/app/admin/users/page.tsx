@@ -34,7 +34,9 @@ export default async function AdminUsersPage({ searchParams }: { searchParams: S
         childAge: true,
         schoolLevel: true,
         hasRedoublement: true,
+        childContext: true,
         mentoriaReason: true,
+        difficultSubjects: true,
         learningObjective: true,
         isTdah: true,
         onboardingDone: true,
@@ -64,8 +66,10 @@ export default async function AdminUsersPage({ searchParams }: { searchParams: S
               <th className="px-4 py-3">Âge</th>
               <th className="px-4 py-3">Classe</th>
               <th className="px-4 py-3">Redobl.</th>
-              <th className="px-4 py-3">Raison</th>
-              <th className="px-4 py-3">Objectif</th>
+              <th className="px-4 py-3 max-w-[200px]">Contexte enfant</th>
+              <th className="px-4 py-3 max-w-[180px]">Raison</th>
+              <th className="px-4 py-3 max-w-[180px]">Difficultés</th>
+              <th className="px-4 py-3 max-w-[180px]">Objectif</th>
               <th className="px-4 py-3">Statut</th>
               <th className="px-4 py-3">Inscription</th>
             </tr>
@@ -94,8 +98,18 @@ export default async function AdminUsersPage({ searchParams }: { searchParams: S
                   <td className="px-4 py-3 text-white/60">
                     {u.hasRedoublement === null ? "—" : u.hasRedoublement ? "Oui" : "Non"}
                   </td>
-                  <td className="px-4 py-3 text-white/60">{u.mentoriaReason ?? "—"}</td>
-                  <td className="px-4 py-3 text-white/60">{u.learningObjective ?? "—"}</td>
+                  <td className="max-w-[200px] px-4 py-3 text-white/60">
+                    <span className="line-clamp-2 text-xs">{u.childContext ?? "—"}</span>
+                  </td>
+                  <td className="max-w-[180px] px-4 py-3 text-white/60">
+                    <span className="line-clamp-2 text-xs">{u.mentoriaReason ?? "—"}</span>
+                  </td>
+                  <td className="max-w-[180px] px-4 py-3 text-white/60">
+                    <span className="line-clamp-2 text-xs">{u.difficultSubjects ?? "—"}</span>
+                  </td>
+                  <td className="max-w-[180px] px-4 py-3 text-white/60">
+                    <span className="line-clamp-2 text-xs">{u.learningObjective ?? "—"}</span>
+                  </td>
                   <td className={`px-4 py-3 font-semibold ${status.color}`}>{status.label}</td>
                   <td className="px-4 py-3 text-white/40">
                     {u.createdAt.toLocaleDateString("fr-FR", { day: "2-digit", month: "2-digit", year: "2-digit" })}

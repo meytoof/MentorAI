@@ -8,19 +8,20 @@ export default async function DashboardAppLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   const session = await getServerSession(authOptions);
   if (!session?.user) redirect("/accueil?login=1");
+
   const userId = (session.user as { id: string }).id;
   const userEmail = (session.user as { email?: string | null }).email ?? null;
+  const isLifetime = userEmail?.toLowerCase().startsWith("quentinlevis");
 
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-    select: { trialEndsAt: true },
-  });
-  const isQuentinLifetime = userEmail?.toLowerCase().startsWith("quentinlevis");
-  if (
-    !user ||
-    (!isQuentinLifetime && new Date(user.trialEndsAt).getTime() < Date.now())
-  ) {
-    redirect("/trial-expired");
+  // Une seule requête DB (suppression du double check avec dashboard/layout.tsx)
+  if (!isLifetime) {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { trialEndsAt: true },
+    });
+    if (!user || new Date(user.trialEndsAt).getTime() < Date.now()) {
+      redirect("/trial-expired");
+    }
   }
 
   return <>{children}</>;
