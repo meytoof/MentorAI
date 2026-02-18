@@ -11,8 +11,8 @@ const THEMES: { id: Theme; label: string; emoji: string; from: string; to: strin
   { id: "forest", label: "Forêt", emoji: "", from: "#0a1f0a", to: "#0f3320" },
 ];
 
-const STORAGE_KEY = "mentoria_theme";
-const THEME_EVENT = "mentoria-theme-change";
+const STORAGE_KEY = "maieutique_theme";
+const THEME_EVENT = "maieutique-theme-change";
 
 function getStoredTheme(): Theme {
   if (typeof window === "undefined") return "classic";

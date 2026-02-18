@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import BrandLogo from "./BrandLogo";
 
 export default function Footer() {
   const [year, setYear] = useState<number | null>(null);
@@ -16,9 +17,8 @@ export default function Footer() {
         <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
           {/* Logo et description */}
           <div className="col-span-1 md:col-span-2">
-            <div className="mb-4 flex items-center">
-              <div className="size-8 rounded bg-blue-600"></div>
-              <span className="ml-2 text-lg font-semibold text-white">MentorIa</span>
+            <div className="mb-4">
+              <BrandLogo size="md" />
             </div>
             <p className="mb-4 max-w-md text-sm text-neutral-400">
               L&apos;IA qui aide ton enfant à faire ses devoirs sans jamais donner la réponse.
@@ -59,7 +59,7 @@ export default function Footer() {
             <h3 className="mb-4 text-sm font-semibold text-white">Support</h3>
             <ul className="space-y-2 text-sm">
               <li>
-                <a href="mailto:contact@mentoria.fr" className="text-neutral-400 hover:text-white transition-colors">
+                <a href="mailto:contact@maieutique.app" className="text-neutral-400 hover:text-white transition-colors">
                   Contact
                 </a>
               </li>
@@ -86,7 +86,7 @@ export default function Footer() {
         <div className="mt-12 border-t border-neutral-800 pt-8">
           <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
             <p className="text-sm text-neutral-400">
-              © {year ?? 2025} MentorIa. Tous droits réservés.
+              © {year ?? 2025} Maieutique. Tous droits réservés.
             </p>
             <div className="flex gap-6 text-sm text-neutral-400">
               <Link href="/cgv" className="hover:text-white transition-colors">

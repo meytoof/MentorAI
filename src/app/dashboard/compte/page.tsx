@@ -197,7 +197,7 @@ export default async function ComptePage() {
           )}
 
           {totalConversations === 0 && (
-            <p className="text-sm text-white/40 italic">Aucune activité encore. Commencez à utiliser MentorIA !</p>
+            <p className="text-sm text-white/40 italic">Aucune activité encore. Commencez à utiliser Maieutique !</p>
           )}
         </section>
       </div>

@@ -10,7 +10,7 @@ const plans = [
     name: "Essai Gratuit",
     price: "0€",
     period: "1 jour",
-    description: "Découvre MentorIA sans engagement",
+    description: "Découvre Maieutique sans engagement",
     features: [
       "Accès complet 7 jours",
       "Aide aux devoirs IA illimitée",
@@ -24,7 +24,7 @@ const plans = [
   },
   {
     id: "monthly",
-    name: "MentorIA Mensuel",
+    name: "Maieutique Mensuel",
     price: "14,90€",
     period: "/ mois",
     description: "Accès illimité, résiliable à tout moment",
@@ -43,7 +43,7 @@ const plans = [
   },
   {
     id: "lifetime",
-    name: "MentorIA à Vie",
+    name: "Maieutique à Vie",
     price: "80€",
     period: "une fois",
     description: "Paiement unique, accès permanent",

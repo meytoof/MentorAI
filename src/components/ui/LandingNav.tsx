@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import { useSession, signOut } from "next-auth/react";
 import LoginModal from "./LoginModal";
+import BrandLogo from "./BrandLogo";
 
 function LandingNavContent() {
   const [loginOpen, setLoginOpen] = useState(false);
@@ -21,10 +22,7 @@ function LandingNavContent() {
       <nav className="sticky top-0 z-50 border-b border-white/6 bg-[#060c18]/85 backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4">
           <Link href="/accueil" className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600">
-              <span className="text-sm font-bold text-white">M</span>
-            </div>
-            <span className="text-lg font-bold tracking-tight text-white">MentorIA</span>
+            <BrandLogo size="md" />
           </Link>
           <div className="hidden items-center gap-8 md:flex">
             <Link href="/accueil#demo" className="text-sm text-white/55 transition-colors hover:text-white">Démo</Link>

@@ -249,7 +249,7 @@ export default function OnboardingPage() {
                 transition={{ delay: 0.25, duration: 0.4 }}
                 className="mb-10 max-w-sm text-white/50"
               >
-                Prenons 2 minutes pour personnaliser MentorIA selon le profil unique de votre enfant.
+                Prenons 2 minutes pour personnaliser Maieutique selon le profil unique de votre enfant.
               </motion.p>
               <motion.button
                 initial={{ y: 20, opacity: 0 }}
@@ -373,7 +373,7 @@ export default function OnboardingPage() {
           {step === 5 && (
             <StepShell
               step={step}
-              title="Pourquoi avez-vous choisi MentorIA ?"
+              title="Pourquoi avez-vous choisi Maieutique ?"
               subtitle="Décrivez librement la situation et ce qui vous a amené ici."
               canNext={state.mentoriaReason.trim().length >= MIN_CHARS}
               onNext={next}
@@ -392,7 +392,7 @@ export default function OnboardingPage() {
             <StepShell
               step={step}
               title="Quelles sont ses principales difficultés ?"
-              subtitle="Matières, types d'exercices, situations particulières... soyez précis, c'est ce qui rend MentorIA vraiment utile."
+              subtitle="Matières, types d'exercices, situations particulières... soyez précis, c'est ce qui rend Maieutique vraiment utile."
               canNext={state.difficultSubjects.trim().length >= MIN_CHARS}
               onNext={next}
               onBack={back}
@@ -410,7 +410,7 @@ export default function OnboardingPage() {
             <StepShell
               step={step}
               title="Qu'espérez-vous accomplir ensemble ?"
-              subtitle="Votre objectif guide la progression et le ton de MentorIA."
+              subtitle="Votre objectif guide la progression et le ton de Maieutique."
               canNext={state.learningObjective.trim().length >= MIN_CHARS}
               onNext={handleFinish}
               onBack={back}
@@ -509,7 +509,7 @@ export default function OnboardingPage() {
                 transition={{ delay: 0.25, duration: 0.4 }}
                 className="mb-8 text-sm text-white/50"
               >
-                MentorIA est configuré pour accompagner votre enfant.
+                Maieutique est configuré pour accompagner votre enfant.
               </motion.p>
 
               <div className="mb-8 flex w-full max-w-xs flex-col gap-3">

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { signOut } from "next-auth/react";
 import { useEffect, useRef, useState } from "react";
+import BrandLogo from "@/components/ui/BrandLogo";
 
 interface DashboardNavProps {
   user: {
@@ -30,8 +31,8 @@ export default function DashboardNav({ user, xp = 0, streak = 0 }: DashboardNavP
 
   return (
     <header className="relative z-50 flex h-14 shrink-0 items-center justify-between border-b border-white/10 bg-black/30 px-4 backdrop-blur-sm sm:px-6">
-      <Link href="/dashboard/whiteboard" className="text-base font-semibold text-white/90 hover:text-white">
-        MentorIA
+      <Link href="/dashboard/whiteboard" className="text-white/90 hover:text-white">
+        <BrandLogo size="sm" showIcon={false} />
       </Link>
 
       {/* Badge XP + Streak centré */}

@@ -8,7 +8,7 @@ const LLM_API_URL = process.env.LLAMA_API_URL ?? "";
 const LLM_MODEL = process.env.LLAMA_MODEL ?? "meta-llama/llama-4-scout-17b-16e-instruct";
 const LLM_API_KEY = process.env.LLAMA_API_KEY ?? "";
 
-const SYSTEM_PROMPT = `Tu es MentorIA, un assistant pédagogique bienveillant pour enfants du primaire (CP–CM2).
+const SYSTEM_PROMPT = `Tu es Maieutique, un assistant pédagogique bienveillant pour enfants du primaire (CP–CM2).
 Tu réponds UNIQUEMENT en français. Tu tutoies TOUJOURS l'enfant (jamais de "vous").
 
 RÈGLE ABSOLUE N°1 : Ne donne JAMAIS la réponse finale. Guide par étapes (méthode socratique).

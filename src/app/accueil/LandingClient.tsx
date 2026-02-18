@@ -5,6 +5,7 @@ import { Suspense, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import LoginModal from "@/components/ui/LoginModal";
+import BrandLogo, { BrandName } from "@/components/ui/BrandLogo";
 
 /* ─── Hook : IntersectionObserver ─── */
 function useInView(threshold = 0.15) {
@@ -144,7 +145,7 @@ function ChatDemo({ tdahMode = false }: { tdahMode?: boolean }) {
           <div className="h-3 w-3 rounded-full bg-red-500/70" />
           <div className="h-3 w-3 rounded-full bg-yellow-500/70" />
           <div className="h-3 w-3 rounded-full bg-green-500/70" />
-          <span className="ml-2 text-xs text-white/40">MentorIA — Tableau</span>
+          <span className="ml-2 text-xs text-white/40">Maieutique — Tableau</span>
           {tdahMode && <span className="ml-auto rounded-full border border-violet-500/40 px-2 py-0.5 text-[10px] font-semibold text-violet-400">Mode TDAH</span>}
         </div>
         {/* Onglets scénario */}
@@ -231,8 +232,7 @@ function LandingClientInner() {
       <nav className="sticky top-0 z-50 border-b border-white/6 bg-[#060c18]/85 backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4">
           <Link href="/accueil" className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600"><span className="text-sm font-bold">M</span></div>
-            <span className="text-lg font-bold tracking-tight">MentorIA</span>
+            <BrandLogo size="md" />
           </Link>
           <div className="hidden items-center gap-8 md:flex">
             {[["#demo", "Démo"], ["#comment-ca-marche", "Comment ça marche"], ["#tdah", "TDAH"], ["#tarifs", "Tarifs"]].map(([href, label]) => (
@@ -287,19 +287,20 @@ function LandingClientInner() {
             <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-blue-500/30 bg-blue-500/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-blue-400">
               <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-blue-400" /> CP · CE1 · CE2 · CM1 · CM2
             </div>
+            <p className="mb-4 text-sm font-medium text-white/40">20h30. Les devoirs traînent. L&apos;enfant bloque. Vous aussi.</p>
             <h1 className="mb-6 text-5xl font-extrabold leading-[1.08] tracking-tight lg:text-6xl">
-              L'IA qui fait{" "}
               <span className="relative">
-                <span className="relative z-10 text-blue-400">vraiment apprendre</span>
+                <span className="relative z-10 text-blue-400">Fini les crises</span>
                 <span className="absolute -bottom-1 left-0 h-[3px] w-full rounded-full bg-blue-400/40" />
               </span>
-              <br />ton enfant.
+              <br />de devoirs.
             </h1>
             <p className="mb-4 text-xl leading-relaxed text-white/60">
-              MentorIA guide étape par étape, surligne les mots clés, explique les règles —{" "}
+              Maieutique guide votre enfant étape par étape, lui pose les bonnes questions —{" "}
               <strong className="text-white/90">sans jamais donner la réponse.</strong>
+              {" "}Il comprend, il retient, il est fier.
             </p>
-            <p className="mb-8 text-sm text-white/35">Conçu pour le primaire · Validé pour les profils TDAH · Méthode socratique</p>
+            <p className="mb-8 text-sm text-white/35">Conçu pour le primaire (CP–CM2) · Validé pour les profils TDAH · Pas ChatGPT : zéro triche</p>
             <div className="flex flex-wrap gap-4">
               {!hasAccess && (
                 <Link href={trialExpired ? "/pricing" : "/signup"} className="group inline-flex items-center gap-2 rounded-xl bg-blue-600 px-8 py-4 text-base font-bold text-white shadow-lg shadow-blue-600/25 transition-all hover:bg-blue-500 hover:scale-[1.02]">
@@ -468,12 +469,131 @@ function LandingClientInner() {
         </div>
       </section>
 
+      {/* ══ CHATGPT VS MAIEUTIQUE ══ */}
+      <section className="border-y border-red-500/10 bg-red-500/[.02] py-24">
+        <div className="mx-auto max-w-6xl px-5">
+          <FadeUp className="mb-14 text-center">
+            <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-red-500/30 bg-red-500/10 px-4 py-1.5 text-xs font-semibold text-red-400">⚠️ La vraie question</div>
+            <h2 className="text-4xl font-bold">&ldquo;ChatGPT fait pareil, non ?&rdquo;</h2>
+            <p className="mt-3 text-white/45">Non. Et la différence change tout pour votre enfant.</p>
+          </FadeUp>
+          {/* Exemple concret */}
+          <FadeUp className="mb-12">
+            <div className="rounded-2xl border border-white/8 bg-white/3 p-6">
+              <p className="mb-4 text-center text-sm font-semibold text-white/50">Même question : &ldquo;Combien font 47 + 28 ?&rdquo;</p>
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="rounded-xl border border-red-500/20 bg-red-500/5 p-5">
+                  <p className="mb-3 text-xs font-bold uppercase tracking-wider text-red-400">ChatGPT</p>
+                  <div className="rounded-lg bg-black/30 px-4 py-3 text-sm text-white/70">&ldquo;47 + 28 = <strong className="text-red-300">75</strong>. Voilà !&rdquo;</div>
+                  <p className="mt-3 text-xs text-red-300/60">L&apos;enfant copie &ldquo;75&rdquo; et passe au suivant. Demain, il aura oublié.</p>
+                </div>
+                <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-5">
+                  <p className="mb-3 text-xs font-bold uppercase tracking-wider text-emerald-400">Maieutique</p>
+                  <div className="space-y-2 rounded-lg bg-black/30 px-4 py-3 text-sm text-white/70">
+                    <p>&ldquo;Commence par les unités : 7 + 8, tu connais ?&rdquo;</p>
+                    <p>&ldquo;15 ! Très bien. Il y a une retenue, tu sais ce que c&apos;est ?&rdquo;</p>
+                  </div>
+                  <p className="mt-3 text-xs text-emerald-300/60">L&apos;enfant comprend le mécanisme. Il saura faire 53 + 39 tout seul.</p>
+                </div>
+              </div>
+            </div>
+          </FadeUp>
+          {/* Tableau comparatif */}
+          <div className="grid gap-5 md:grid-cols-2">
+            <FadeUp>
+              <div className="h-full rounded-2xl border border-red-500/15 bg-red-500/[.03] p-7">
+                <div className="mb-5 flex items-center gap-3">
+                  <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-red-500/15 text-lg">🤖</span>
+                  <div>
+                    <p className="font-bold text-white/80">ChatGPT / IA généraliste</p>
+                    <p className="text-xs text-red-400">Gratuit, mais à quel prix ?</p>
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  {[
+                    "Donne la réponse directement",
+                    "L'enfant copie sans comprendre",
+                    "Langage adulte, pas adapté aux enfants",
+                    "Aucune protection TDAH",
+                    "Zéro suivi pédagogique",
+                    "Risque de contenu hors-sujet ou inapproprié",
+                  ].map((item) => (
+                    <div key={item} className="flex items-start gap-2.5">
+                      <span className="mt-0.5 text-sm text-red-400">✗</span>
+                      <p className="text-sm text-white/50">{item}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </FadeUp>
+            <FadeUp delay={100}>
+              <div className="h-full rounded-2xl border border-emerald-500/15 bg-emerald-500/[.03] p-7">
+                <div className="mb-5 flex items-center gap-3">
+                  <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/15 text-lg">🎓</span>
+                  <div>
+                    <p className="font-bold text-white/80">Maieutique</p>
+                    <p className="text-xs text-emerald-400">Conçu pour apprendre, pas pour tricher</p>
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  {[
+                    "Guide par questions, ne donne jamais la réponse",
+                    "L'enfant comprend et retient durablement",
+                    "Langage adapté CP → CM2, selon le niveau",
+                    "Mode TDAH validé (bulles courtes, zéro distraction)",
+                    "Suivi par matière + historique des sessions",
+                    "100% cadré scolaire, contenu filtré",
+                  ].map((item) => (
+                    <div key={item} className="flex items-start gap-2.5">
+                      <span className="mt-0.5 text-sm text-emerald-400">✓</span>
+                      <p className="text-sm text-white/50">{item}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </FadeUp>
+          </div>
+          <FadeUp delay={150} className="mt-8 text-center">
+            <p className="text-sm text-white/35">ChatGPT est un outil génial — pour les adultes. Pour un enfant de 8 ans qui doit comprendre ses devoirs, il faut un outil <strong className="text-white/60">pensé pour lui</strong>.</p>
+          </FadeUp>
+        </div>
+      </section>
+
       {/* ══ COMMENT ÇA MARCHE ══ */}
       <section id="comment-ca-marche" className="py-24">
         <div className="mx-auto max-w-7xl px-5">
           <FadeUp className="mb-16 text-center">
             <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-blue-400">Simple comme bonjour</p>
             <h2 className="text-4xl font-bold">3 étapes, et ton enfant comprend</h2>
+          </FadeUp>
+          {/* Mini avant / après */}
+          <FadeUp className="mb-14">
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="rounded-2xl border border-red-500/15 bg-red-500/[.03] p-6">
+                <p className="mb-4 text-xs font-bold uppercase tracking-wider text-red-400">❌ Sans Maieutique</p>
+                <div className="flex items-start gap-3">
+                  <div className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-red-500/15 text-xs">👦</div>
+                  <div className="space-y-2 text-sm text-white/55">
+                    <p>&ldquo;Maman c&apos;est quoi la réponse ?&rdquo;</p>
+                    <p className="text-white/30">→ Le parent donne la réponse (ou s&apos;énerve)</p>
+                    <p className="text-white/30">→ L&apos;enfant l&apos;écrit sans comprendre</p>
+                    <p className="font-medium text-red-300/60">→ Le lendemain, il a oublié</p>
+                  </div>
+                </div>
+              </div>
+              <div className="rounded-2xl border border-emerald-500/15 bg-emerald-500/[.03] p-6">
+                <p className="mb-4 text-xs font-bold uppercase tracking-wider text-emerald-400">✅ Avec Maieutique</p>
+                <div className="flex items-start gap-3">
+                  <div className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-emerald-500/15 text-xs">🤖</div>
+                  <div className="space-y-2 text-sm text-white/55">
+                    <p>&ldquo;Qu&apos;est-ce que tu remarques dans cet énoncé ?&rdquo;</p>
+                    <p className="text-white/30">→ L&apos;enfant réfléchit, guidé étape par étape</p>
+                    <p className="text-white/30">→ Il trouve la réponse lui-même</p>
+                    <p className="font-medium text-emerald-300/60">→ Il s&apos;en souvient — et il est fier</p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </FadeUp>
           <div className="relative grid gap-8 md:grid-cols-3">
             <div className="absolute top-8 left-[16%] right-[16%] hidden h-px bg-gradient-to-r from-transparent via-blue-500/30 to-transparent md:block" />
@@ -521,13 +641,60 @@ function LandingClientInner() {
       </div>
       )}
 
+      {/* ══ POURQUOI MAIEUTIQUE ? ══ */}
+      <section className="py-24">
+        <div className="mx-auto max-w-5xl px-5">
+          <FadeUp className="mb-14 text-center">
+            <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-cyan-500/30 bg-cyan-500/10 px-4 py-1.5 text-xs font-semibold text-cyan-400">📜 Le saviez-vous ?</div>
+            <h2 className="text-4xl font-bold">Pourquoi <span className="bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">Maieutique</span> ?</h2>
+          </FadeUp>
+          <div className="grid items-center gap-12 lg:grid-cols-2">
+            <FadeUp>
+              <div className="space-y-6 text-white/65 leading-relaxed">
+                <p className="text-lg">
+                  Il y a 2 400 ans, <strong className="text-white/90">Socrate</strong> enseignait sans jamais donner de réponse. Sa méthode ? Poser les bonnes questions pour que son élève découvre la vérité <em>par lui-même</em>.
+                </p>
+                <p>
+                  Cette approche porte un nom : la <strong className="text-white/90">maïeutique</strong> (du grec <em>maieutikè</em>, &ldquo;l&apos;art d&apos;accoucher les esprits&rdquo;). Socrate se comparait à une sage-femme : il n&apos;apportait pas le savoir, il aidait l&apos;autre à le faire naître.
+                </p>
+                <p>
+                  C&apos;est exactement ce que fait notre <span className="bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text font-semibold text-transparent">IA</span> : elle guide ton enfant question après question, indice après indice — jusqu&apos;à ce qu&apos;il comprenne seul. <strong className="text-white/90">Pas de réponse toute faite. Jamais.</strong>
+                </p>
+              </div>
+            </FadeUp>
+            <FadeUp delay={150}>
+              <div className="relative rounded-2xl border border-white/8 bg-white/3 p-8">
+                <div className="absolute -top-3 -right-3 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 text-2xl shadow-lg shadow-cyan-500/20">🏛️</div>
+                <blockquote className="mb-5 text-lg italic leading-relaxed text-white/70">
+                  &ldquo;Je ne peux rien enseigner à personne, je ne peux que les faire réfléchir.&rdquo;
+                </blockquote>
+                <p className="text-sm font-semibold text-white/50">— Socrate <span className="text-white/25">(470–399 av. J.-C.)</span></p>
+                <div className="mt-6 space-y-3">
+                  {[
+                    { icon: "❓", text: "L'IA pose des questions au lieu de donner les réponses" },
+                    { icon: "💡", text: "Les indices guident sans révéler la solution" },
+                    { icon: "🧠", text: "L'enfant construit sa compréhension étape par étape" },
+                    { icon: "🏆", text: "La fierté de trouver seul renforce la confiance" },
+                  ].map((item) => (
+                    <div key={item.text} className="flex items-start gap-3">
+                      <span className="mt-0.5 text-base">{item.icon}</span>
+                      <p className="text-sm text-white/55">{item.text}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </FadeUp>
+          </div>
+        </div>
+      </section>
+
       {/* ══ SECTION TDAH APPROFONDIE ══ */}
       <section id="tdah" className="py-24">
         <div className="mx-auto max-w-7xl px-5">
           <FadeUp className="mb-14 text-center">
             <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-violet-500/30 bg-violet-500/10 px-4 py-1.5 text-xs font-semibold text-violet-400">🧠 Pensé pour le TDAH</div>
             <h2 className="text-4xl font-bold">Un outil conçu pour les cerveaux qui fonctionnent différemment</h2>
-            <p className="mt-4 max-w-2xl mx-auto text-white/50 leading-relaxed">Les enfants TDAH ont besoin d'un environnement structuré, de consignes courtes et de feedback immédiat. MentorIA est conçu pour ça — pas en option, au cœur du produit.</p>
+            <p className="mt-4 max-w-2xl mx-auto text-white/50 leading-relaxed">Les enfants TDAH ont besoin d&apos;un environnement structuré, de consignes courtes et de feedback immédiat. Maieutique est conçu pour ça — pas en option, au cœur du produit.</p>
           </FadeUp>
           <div className="grid items-start gap-10 lg:grid-cols-2">
             {/* Features */}
@@ -624,7 +791,7 @@ function LandingClientInner() {
           </FadeUp>
           <div className="grid gap-5 md:grid-cols-3">
             {[
-              { name: "Sophie M.", role: "Maman de Lucas, CE2", avatar: "S", color: "blue", stars: 5, text: "Mon fils détestait les devoirs. Avec MentorIA, il pose des questions lui-même. Il a compris qu'il peut trouver les réponses — il n'a plus besoin qu'on lui mâche le travail.", tag: "Autonomie" },
+              { name: "Sophie M.", role: "Maman de Lucas, CE2", avatar: "S", color: "blue", stars: 5, text: "Mon fils détestait les devoirs. Avec Maieutique, il pose des questions lui-même. Il a compris qu'il peut trouver les réponses — il n'a plus besoin qu'on lui mâche le travail.", tag: "Autonomie" },
               { name: "Thomas K.", role: "Papa de Léa, CM1 · TDAH", avatar: "T", color: "violet", stars: 5, text: "Le mode TDAH change tout. Les bulles courtes, pas d'animation qui distrait. Léa reste concentrée 20 minutes là où elle décrochait après 3. C'est concret, ça marche.", tag: "TDAH" },
               { name: "Amina R.", role: "Maman de Yassin, CP", avatar: "A", color: "emerald", stars: 5, text: "J'avais peur que ce soit une machine à donner les réponses. C'est l'inverse. L'IA pose des questions, guide doucement. Mon fils est fier quand il trouve seul.", tag: "Confiance" },
             ].map((t, i) => {
@@ -664,13 +831,73 @@ function LandingClientInner() {
         </div>
       </section>
 
+      {/* ══ FAQ ANTI-OBJECTIONS ══ */}
+      <section className="py-24">
+        <div className="mx-auto max-w-3xl px-5">
+          <FadeUp className="mb-12 text-center">
+            <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-amber-500/30 bg-amber-500/10 px-4 py-1.5 text-xs font-semibold text-amber-400">💬 On vous répond</div>
+            <h2 className="text-4xl font-bold">Vos questions, sans langue de bois</h2>
+          </FadeUp>
+          <div className="space-y-4">
+            {[
+              {
+                q: "Mon enfant peut utiliser ChatGPT gratuitement, pourquoi payer ?",
+                a: "ChatGPT donne les réponses = votre enfant copie et n'apprend rien. C'est la définition de la triche numérique. Maieutique guide sans jamais donner la solution : l'enfant comprend, retient, et progresse. C'est la différence entre copier et apprendre.",
+              },
+              {
+                q: "Le soutien scolaire coûte 20 €/mois, c'est pareil non ?",
+                a: "Le soutien scolaire, c'est 1h fixe le soir — pas le dimanche à 20h30 quand les devoirs traînent. Maieutique est disponible 24h/24, 7j/7, illimité, et s'adapte au rythme de chaque enfant. Et c'est moins cher.",
+              },
+              {
+                q: "C'est juste de l'IA, ça ne vaut pas un vrai prof…",
+                a: "Maieutique ne remplace pas un enseignant — c'est un copilote pour les devoirs du soir. Quand le parent galère à expliquer les fractions à 20h30, Maieutique prend le relais avec patience et pédagogie. Illimité. Zéro jugement.",
+              },
+              {
+                q: "Mon enfant est au collège, ça marche aussi ?",
+                a: "Maieutique est aujourd'hui optimisé pour le primaire (CP à CM2). Le contenu, le langage et les méthodes sont calibrés pour cette tranche d'âge. Le collège arrive bientôt — inscrivez-vous pour être prévenu.",
+              },
+            ].map(({ q, a }, i) => (
+              <FadeUp key={q} delay={i * 80}>
+                <details className="group rounded-2xl border border-white/8 bg-white/3 transition-colors hover:border-white/15">
+                  <summary className="flex cursor-pointer items-center justify-between gap-4 px-6 py-5 text-left font-semibold text-white/80">
+                    {q}
+                    <span className="shrink-0 text-white/25 transition-transform group-open:rotate-45">+</span>
+                  </summary>
+                  <div className="px-6 pb-5 text-sm leading-relaxed text-white/50">{a}</div>
+                </details>
+              </FadeUp>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ══ TARIFS ══ */}
       <section id="tarifs" className="border-y border-white/6 bg-white/2 py-24">
         <div className="mx-auto max-w-5xl px-5">
-          <FadeUp className="mb-16 text-center">
+          <FadeUp className="mb-10 text-center">
             <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-blue-400">Tarifs</p>
             <h2 className="text-4xl font-bold">Des soirées devoirs plus sereines</h2>
             <p className="mt-3 text-white/38">Commencez par 1 jour d'essai — sans carte bancaire en bêta.</p>
+          </FadeUp>
+          {/* Bandeau comparaison prix */}
+          <FadeUp className="mb-12">
+            <div className="grid gap-3 md:grid-cols-3">
+              <div className="rounded-xl border border-white/8 bg-white/3 p-4 text-center">
+                <p className="text-xs font-semibold uppercase text-white/35">Prof particulier</p>
+                <p className="mt-1 text-2xl font-extrabold text-white/50">~30€<span className="text-base font-normal text-white/30">/h</span></p>
+                <p className="mt-1 text-xs text-white/25">1 à 2 séances par semaine</p>
+              </div>
+              <div className="rounded-xl border border-white/8 bg-white/3 p-4 text-center">
+                <p className="text-xs font-semibold uppercase text-white/35">Soutien scolaire</p>
+                <p className="mt-1 text-2xl font-extrabold text-white/50">~20€<span className="text-base font-normal text-white/30">/mois</span></p>
+                <p className="mt-1 text-xs text-white/25">1h le soir, horaires fixes</p>
+              </div>
+              <div className="rounded-xl border border-blue-500/30 bg-blue-500/8 p-4 text-center">
+                <p className="text-xs font-semibold uppercase text-blue-400">Maieutique</p>
+                <p className="mt-1 text-2xl font-extrabold text-blue-300">14,90€<span className="text-base font-normal text-blue-300/50">/mois</span></p>
+                <p className="mt-1 text-xs text-blue-300/50">Illimité · 24h/24 · 7j/7</p>
+              </div>
+            </div>
           </FadeUp>
           <div className="grid gap-6 md:grid-cols-3">
             <FadeUp delay={0}>
@@ -693,9 +920,10 @@ function LandingClientInner() {
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-blue-500 px-4 py-1 text-xs font-bold">Recommandé</div>
                 <p className="mb-1 text-sm font-semibold text-blue-300">Abonnement mensuel</p>
                 <div className="mb-1 flex items-end gap-1"><span className="text-5xl font-extrabold">14,90€</span><span className="mb-1.5 text-sm text-white/38">/mois</span></div>
-                <p className="mb-5 text-xs text-white/28">Pour un suivi toute l'année</p>
+                <p className="mb-1 text-xs text-blue-300/60">Moins de 0,50 € par jour</p>
+                <p className="mb-5 text-xs text-white/28">Disponible à 21h quand les devoirs traînent</p>
                 <ul className="mb-8 flex-1 space-y-2.5 text-sm text-white/68">
-                  {["Aide illimitée pour un enfant", "Historique pédagogique", "Profil TDAH optimisé", "Annulable à tout moment"].map(f => (
+                  {["Aide illimitée 24h/24, 7j/7", "Historique pédagogique", "Profil TDAH optimisé", "Annulable à tout moment"].map(f => (
                     <li key={f} className="flex items-center gap-2"><span className="text-blue-400">✓</span>{f}</li>
                   ))}
                 </ul>
@@ -731,7 +959,7 @@ function LandingClientInner() {
           <h2 className="mb-4 text-4xl font-extrabold leading-tight lg:text-5xl">
             Prêt à transformer<br />les soirées devoirs ?
           </h2>
-          <p className="mb-8 text-lg text-white/42">Rejoignez les 320+ familles qui font confiance à MentorIA.</p>
+          <p className="mb-8 text-lg text-white/42">Rejoignez les 320+ familles qui font confiance à Maieutique.</p>
           {hasAccess ? (
             <Link href="/dashboard" className="inline-flex items-center gap-3 rounded-xl bg-blue-600 px-10 py-4 text-lg font-bold text-white shadow-xl shadow-blue-600/20 transition-all hover:bg-blue-500 hover:shadow-blue-500/25 hover:scale-[1.03]">
               Accéder à mon tableau de bord →
@@ -757,14 +985,13 @@ function LandingClientInner() {
       <footer className="border-t border-white/6 py-10">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-5 text-xs text-white/22 md:flex-row">
           <div className="flex items-center gap-2">
-            <div className="flex h-6 w-6 items-center justify-center rounded-md bg-blue-600 text-xs font-bold text-white">M</div>
-            <span>MentorIA © {new Date().getFullYear()}</span>
+            <span className="text-white/40 font-medium"><BrandName /> © {new Date().getFullYear()}</span>
           </div>
           <div className="flex gap-6">
             <a href="/mentions-legales" className="hover:text-white/55 transition-colors">Mentions légales</a>
             <a href="/confidentialite" className="hover:text-white/55 transition-colors">Confidentialité</a>
             <a href="/cgv" className="hover:text-white/55 transition-colors">CGV</a>
-            <a href="mailto:contact@mentoria.fr" className="hover:text-white/55 transition-colors">Contact</a>
+            <a href="mailto:contact@maieutique.app" className="hover:text-white/55 transition-colors">Contact</a>
           </div>
           <p>Fait avec ❤️ pour les enfants qui apprennent différemment</p>
         </div>

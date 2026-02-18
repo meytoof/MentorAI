@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Conditions Générales de Vente | MentorIa",
-  description: "CGV de MentorIa — aide aux devoirs IA pour enfants du primaire.",
+  title: "Conditions Générales de Vente | Maieutique",
+  description: "CGV de Maieutique — aide aux devoirs IA pour enfants du primaire.",
 };
 
 export default function CGVPage() {
@@ -15,7 +15,7 @@ export default function CGVPage() {
       <div className="space-y-8 text-neutral-300">
         <section>
           <h2 className="mb-3 text-xl font-semibold text-white">1. Objet</h2>
-          <p>Les présentes CGV régissent les relations contractuelles entre MentorIa et tout utilisateur souhaitant accéder aux services payants.</p>
+          <p>Les présentes CGV régissent les relations contractuelles entre Maieutique et tout utilisateur souhaitant accéder aux services payants.</p>
         </section>
         <section>
           <h2 className="mb-3 text-xl font-semibold text-white">2. Offres et tarifs</h2>
@@ -27,7 +27,7 @@ export default function CGVPage() {
         </section>
         <section>
           <h2 className="mb-3 text-xl font-semibold text-white">3. Paiement</h2>
-          <p>Paiement sécurisé via Stripe. MentorIa ne stocke aucune donnée bancaire.</p>
+          <p>Paiement sécurisé via Stripe. Maieutique ne stocke aucune donnée bancaire.</p>
         </section>
         <section>
           <h2 className="mb-3 text-xl font-semibold text-white">4. Droit de rétractation</h2>
@@ -39,7 +39,7 @@ export default function CGVPage() {
         </section>
         <section>
           <h2 className="mb-3 text-xl font-semibold text-white">6. Contact</h2>
-          <p><a href="mailto:contact@mentoria.fr" className="text-blue-400 hover:underline">contact@mentoria.fr</a></p>
+          <p><a href="mailto:contact@maieutique.app" className="text-blue-400 hover:underline">contact@maieutique.app</a></p>
         </section>
       </div>
     </div>

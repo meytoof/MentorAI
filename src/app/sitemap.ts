@@ -1,7 +1,7 @@
 import { MetadataRoute } from "next";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const base = process.env.NEXTAUTH_URL ?? "https://mentoria.fr";
+  const base = process.env.NEXTAUTH_URL ?? "https://maieutique.app";
   return [
     { url: `${base}/accueil`, lastModified: new Date(), changeFrequency: "weekly", priority: 1 },
     { url: `${base}/signup`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.9 },

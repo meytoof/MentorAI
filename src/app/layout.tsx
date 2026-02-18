@@ -15,15 +15,15 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "MentorIa - Aide aux devoirs IA pour enfants primaire | TDAH",
-    template: "%s | MentorIa",
+    default: "Maieutique — L'IA socratique d'aide aux devoirs | Primaire & TDAH",
+    template: "%s | Maieutique",
   },
-  description: "L'IA qui aide ton enfant à faire ses devoirs sans jamais donner la réponse. Conçu pour le CP au CM2, validé avec des spécialistes TDAH. Photo de devoir, explications étape par étape.",
-  keywords: ["aide aux devoirs", "primaire", "TDAH", "IA", "devoirs enfants", "CP", "CE1", "CE2", "CM1", "CM2"],
-  authors: [{ name: "MentorIa" }],
+  description: "L'IA qui aide ton enfant à faire ses devoirs sans jamais donner la réponse. Méthode socratique, du CP au CM2, validé pour les profils TDAH. Photo de devoir, explications étape par étape.",
+  keywords: ["aide aux devoirs", "primaire", "TDAH", "IA", "maïeutique", "méthode socratique", "devoirs enfants", "CP", "CE1", "CE2", "CM1", "CM2"],
+  authors: [{ name: "Maieutique" }],
   openGraph: {
-    title: "MentorIa - Aide aux devoirs intelligente pour enfants",
-    description: "L'IA qui aide ton enfant à faire ses devoirs sans jamais donner la réponse. Pensé pour les enfants TDAH.",
+    title: "Maieutique — L'IA qui guide ton enfant sans donner les réponses",
+    description: "Méthode socratique + IA : ton enfant apprend à réfléchir par lui-même. Pensé pour le primaire et les profils TDAH.",
     type: "website",
   },
   robots: {

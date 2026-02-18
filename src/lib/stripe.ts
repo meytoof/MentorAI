@@ -10,14 +10,14 @@ export const stripe = new Stripe(stripeKey, {
 // Plans disponibles
 export const PLANS = {
   monthly: {
-    name: "MentorIA Mensuel",
+    name: "Maieutique Mensuel",
     priceId: process.env.STRIPE_PRICE_MONTHLY!,
     price: 9.99,
     interval: "month" as const,
     description: "Accès illimité, résiliable à tout moment",
   },
   lifetime: {
-    name: "MentorIA à Vie",
+    name: "Maieutique à Vie",
     priceId: process.env.STRIPE_PRICE_LIFETIME!,
     price: 79,
     interval: "one_time" as const,

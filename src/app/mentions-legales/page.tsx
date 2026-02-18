@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Mentions légales | MentorIa",
+  title: "Mentions légales | Maieutique",
 };
 
 export default function MentionsLegalesPage() {
@@ -14,7 +14,7 @@ export default function MentionsLegalesPage() {
       <div className="space-y-8 text-neutral-300">
         <section>
           <h2 className="mb-3 text-xl font-semibold text-white">Éditeur</h2>
-          <p>MentorIa — <a href="mailto:contact@mentoria.fr" className="text-blue-400 hover:underline">contact@mentoria.fr</a></p>
+          <p>Maieutique — <a href="mailto:contact@maieutique.app" className="text-blue-400 hover:underline">contact@maieutique.app</a></p>
         </section>
         <section>
           <h2 className="mb-3 text-xl font-semibold text-white">Hébergement</h2>
@@ -30,7 +30,7 @@ export default function MentionsLegalesPage() {
         </section>
         <section>
           <h2 className="mb-3 text-xl font-semibold text-white">Intelligence artificielle</h2>
-          <p>MentorIa utilise des modèles IA (Groq / Meta Llama) pour générer des réponses pédagogiques. Ces réponses peuvent contenir des erreurs. MentorIa ne garantit pas leur exactitude absolue.</p>
+          <p>Maieutique utilise des modèles IA (Groq / Meta Llama) pour générer des réponses pédagogiques. Ces réponses peuvent contenir des erreurs. Maieutique ne garantit pas leur exactitude absolue.</p>
         </section>
       </div>
     </div>

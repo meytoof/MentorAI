@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Essai terminé — MentorIa",
+  title: "Essai terminé — Maieutique",
   robots: { index: false },
 };
 
@@ -19,7 +19,7 @@ export default function TrialExpiredPage() {
           Ton essai gratuit est terminé
         </h1>
         <p className="mb-8 text-white/60">
-          Tu as exploré MentorIa pendant 1 jour. Pour continuer à aider{" "}
+          Tu as exploré Maieutique pendant 1 jour. Pour continuer à aider{" "}
           <span className="text-white/80">ton enfant avec ses devoirs</span>, choisis
           la formule qui te convient.
         </p>

@@ -1,7 +1,7 @@
 import { MetadataRoute } from "next";
 
 export default function robots(): MetadataRoute.Robots {
-  const base = process.env.NEXTAUTH_URL ?? "https://mentoria.fr";
+  const base = process.env.NEXTAUTH_URL ?? "https://maieutique.app";
   return {
     rules: [
       {
