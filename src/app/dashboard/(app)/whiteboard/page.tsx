@@ -23,6 +23,7 @@ interface ChatMessage {
   timestamp: Date;
   hasImage?: boolean;
   imagePreview?: string | null;
+  evaluation?: "correct" | "incorrect" | "partial" | null;
 }
 
 interface TooltipState {
@@ -44,6 +45,12 @@ export default function WhiteboardPage() {
   const [aiSpeaking, setAiSpeaking] = useState(false);
   const [hoveredMsgIdx, setHoveredMsgIdx] = useState<number | null>(null);
   const [tooltip, setTooltip] = useState<TooltipState | null>(null);
+
+  // Challenge / Défi mode
+  const [challengeActive, setChallengeActive] = useState(false);
+  const [lastEvaluation, setLastEvaluation] = useState<"correct" | "incorrect" | "partial" | null>(null);
+  const [showSuccessFlash, setShowSuccessFlash] = useState(false);
+  const [successCombo, setSuccessCombo] = useState(0);
 
   // Gamification
   const [mascot, setMascot] = useState<MascotId | null>(null);
@@ -295,11 +302,13 @@ export default function WhiteboardPage() {
       if (imageFile) {
         try { imageDataUrl = await readFileAsDataURL(imageFile); } catch (err) { console.error("Erreur de lecture de l'image:", err); }
       }
+      const prevMessages = messages.filter(m => m.role === "user" || (m.role === "assistant" && !m.content.startsWith("✨")));
+      const history = prevMessages.slice(-10).map(m => ({ role: m.role, content: m.content }));
       setMessages((prev) => [...prev, { role: "user", content: userQuestion, timestamp: new Date(), hasImage: !!imageDataUrl, imagePreview }]);
       const res = await fetch("/api/assist", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ question: userQuestion, canvasImage: null, image: imageDataUrl }),
+        body: JSON.stringify({ question: userQuestion, canvasImage: null, image: imageDataUrl, history }),
         signal: controller.signal,
       });
       clearTimeout(timeoutId);
@@ -312,17 +321,35 @@ export default function WhiteboardPage() {
           if (stepMatches?.length) bubbles = stepMatches.map((s) => s.trim()).filter(Boolean);
           else if (msg) bubbles = [msg];
         }
-        const newAssistantMessages: ChatMessage[] = bubbles.map((bulle) => ({
+
+        const evaluation = data.evaluation ?? null;
+        setLastEvaluation(evaluation);
+
+        if (evaluation === "correct") {
+          setSuccessCombo(prev => prev + 1);
+          setShowSuccessFlash(true);
+          setTimeout(() => setShowSuccessFlash(false), 1800);
+          awardXP(25 + successCombo * 5);
+        } else if (evaluation === "incorrect") {
+          setSuccessCombo(0);
+        }
+
+        const newAssistantMessages: ChatMessage[] = bubbles.map((bulle, i) => ({
           role: "assistant" as const,
           content: bulle.trim(),
           segments: data.segments,
           timestamp: new Date(),
+          evaluation: i === 0 ? evaluation : null,
         }));
         setMessages((prev) => [...prev, ...newAssistantMessages]);
+
+        const lastBubble = bubbles[bubbles.length - 1] ?? "";
+        const endsWithQuestion = /\?\s*["»]?\s*$/.test(lastBubble);
+        setChallengeActive(endsWithQuestion);
+
         if (data.encouragement) {
           setMessages((prev) => [...prev, { role: "assistant", content: `✨ ${data.encouragement}`, timestamp: new Date() }]);
         }
-        // Award 10 XP for each successful AI response
         awardXP(10);
       } else {
         await res.json().catch(() => ({}));
@@ -370,6 +397,25 @@ export default function WhiteboardPage() {
           onSelect={(m) => setMascot(m)}
           onClose={() => setShowMascotPicker(false)}
         />
+      )}
+
+      {/* Success flash overlay */}
+      {showSuccessFlash && (
+        <div className="pointer-events-none fixed inset-0 z-[9998] animate-[success-flash_1.8s_ease-out_forwards]">
+          <div className="absolute inset-0 bg-emerald-900/40" />
+          <div className="flex h-full items-center justify-center">
+            <div className="animate-[success-pop_0.6s_cubic-bezier(0.34,1.56,0.64,1)_forwards] flex flex-col items-center gap-4">
+              <div className="flex h-28 w-28 items-center justify-center rounded-full bg-emerald-500/30 ring-[5px] ring-emerald-400/60 shadow-[0_0_60px_rgba(16,185,129,0.4)]">
+                <svg className="h-16 w-16 text-emerald-300" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" className="animate-[check-draw_0.4s_ease-out_0.2s_both]" style={{ strokeDasharray: 30, strokeDashoffset: 30 }} />
+                </svg>
+              </div>
+              <p className="text-3xl font-extrabold text-emerald-200 drop-shadow-[0_2px_12px_rgba(16,185,129,0.6)]">
+                {successCombo > 1 ? `${successCombo}× Combo ! 🔥` : "Bravo ! 🎉"}
+              </p>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Tooltip global fixed */}
@@ -466,9 +512,29 @@ export default function WhiteboardPage() {
                 <p className={`mt-2 ${isTdah ? "text-sm text-neutral-400" : "text-sm text-white/50"}`}>Par exemple : &quot;Explique-moi l&apos;associativité&quot; ou &quot;Aide-moi sur ce devoir&quot;.</p>
               </div>
             )}
-            {messages.map((msg, idx) => (
-              <div key={idx} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"} ${!isTdah ? "animate-[bubble-in_0.35s_ease-out]" : ""}`} onMouseEnter={() => setHoveredMsgIdx(idx)} onMouseLeave={() => setHoveredMsgIdx(null)}>
-                <div className={`max-w-[92%] rounded-2xl px-5 py-4 text-base leading-relaxed ${isTdah ? "rounded-lg" : "transition-opacity duration-300"} ${msg.role === "user" ? "bg-blue-600/90 text-white" : isTdah ? "bg-neutral-800/90 text-white border border-neutral-700" : "bg-white/10 text-white/95 backdrop-blur-sm border border-white/10"}`} style={{ opacity: msg.role === "user" ? 1 : (isTdah ? 1 : (opacities[idx] ?? 1)) }}>
+            {messages.map((msg, idx) => {
+              const evalBubbleClass = msg.evaluation === "correct"
+                ? "border-emerald-400/60 bg-emerald-950/80 text-white/95"
+                : msg.evaluation === "incorrect"
+                  ? "border-orange-400/50 bg-orange-950/70 text-white/95"
+                  : msg.evaluation === "partial"
+                    ? "border-amber-400/50 bg-amber-950/70 text-white/95"
+                    : "";
+              return (
+              <div key={idx} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"} ${msg.evaluation === "correct" && !isTdah ? "animate-[success-bubble_0.5s_ease-out]" : !isTdah ? "animate-[bubble-in_0.35s_ease-out]" : ""}`} onMouseEnter={() => setHoveredMsgIdx(idx)} onMouseLeave={() => setHoveredMsgIdx(null)}>
+                <div className={`max-w-[92%] rounded-2xl px-5 py-4 text-base leading-relaxed ${isTdah ? "rounded-lg" : "transition-opacity duration-300"} ${msg.role === "user" ? "bg-blue-600/90 text-white" : evalBubbleClass || (isTdah ? "bg-neutral-800/90 text-white border border-neutral-700" : "bg-white/10 text-white/95 backdrop-blur-sm border border-white/10")}`} style={{ opacity: msg.role === "user" ? 1 : (isTdah ? 1 : (opacities[idx] ?? 1)) }}>
+                  {msg.evaluation && (
+                    <div className={`mb-3 inline-flex items-center gap-2 rounded-full px-3 py-1 text-sm font-semibold ${
+                      msg.evaluation === "correct"
+                        ? "bg-emerald-500/25 text-emerald-200"
+                        : msg.evaluation === "incorrect"
+                          ? "bg-orange-500/25 text-orange-200"
+                          : "bg-amber-500/25 text-amber-200"
+                    }`}>
+                      <span>{msg.evaluation === "correct" ? "✅" : msg.evaluation === "incorrect" ? "💪" : "🔶"}</span>
+                      <span>{msg.evaluation === "correct" ? "Bonne réponse !" : msg.evaluation === "incorrect" ? "Pas tout à fait..." : "Tu y es presque !"}</span>
+                    </div>
+                  )}
                   {msg.hasImage && msg.imagePreview && (
                     <div className="mb-3 flex items-center gap-3">
                       <div className="h-12 w-12 overflow-hidden rounded-lg border border-white/20">
@@ -481,7 +547,8 @@ export default function WhiteboardPage() {
                   <div className="whitespace-pre-wrap text-[17px] [&_.text-red-600]:text-red-400 [&_.text-blue-600]:text-blue-300">{formatMessage(msg.content, msg.segments)}</div>
                 </div>
               </div>
-            ))}
+              );
+            })}
             {isLoading && (
               <div className={`flex justify-start ${!isTdah ? "animate-[bubble-in_0.3s_ease-out]" : ""}`}>
                 <div className={`flex items-center gap-3 px-5 py-3 text-base ${isTdah ? "rounded-lg border border-neutral-700 bg-neutral-800/50 text-neutral-400" : "rounded-2xl border border-white/10 bg-white/5 text-white/70"}`}>
@@ -510,9 +577,20 @@ export default function WhiteboardPage() {
               </div>
             )}
           </div>
+          {challengeActive && (
+            <div className={`flex items-center gap-2 rounded-lg px-3.5 py-2 text-sm font-semibold ${isTdah ? "bg-amber-900/60 text-amber-100 border border-amber-600/40" : "bg-amber-900/50 text-amber-100 border border-amber-500/40"}`}>
+              <span className="text-base">🎯</span>
+              <span>Défi en cours — à toi de répondre !</span>
+              {successCombo > 1 && (
+                <span className="ml-auto rounded-full bg-emerald-600/30 px-2.5 py-0.5 text-xs font-bold text-emerald-200 ring-1 ring-emerald-500/40">
+                  {successCombo}× combo 🔥
+                </span>
+              )}
+            </div>
+          )}
           <div className="flex gap-3">
-            <input className={`flex-1 px-5 py-3 text-base text-white placeholder-white/40 focus:border-blue-500/60 focus:outline-none focus:ring-1 focus:ring-blue-500/40 disabled:opacity-50 ${isTdah ? "rounded-md border border-neutral-600 bg-neutral-800" : "rounded-full border border-white/20 bg-white/5"}`} placeholder="Pose une question ou envoie une photo..." value={question} onChange={(e) => setQuestion(e.target.value)} onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && askAI()} disabled={isLoading} />
-            <button onClick={askAI} disabled={isLoading || (!question.trim() && !imageFile)} className={`inline-flex h-12 w-12 flex-shrink-0 items-center justify-center bg-blue-600 text-white hover:bg-blue-500 disabled:opacity-50 text-lg ${isTdah ? "rounded-md" : "rounded-full"}`}>→</button>
+            <input className={`flex-1 px-5 py-3 text-base text-white focus:outline-none disabled:opacity-50 ${challengeActive ? "placeholder-amber-200/60 focus:border-amber-400/70 focus:ring-1 focus:ring-amber-400/50" : "placeholder-white/50 focus:border-blue-500/60 focus:ring-1 focus:ring-blue-500/40"} ${isTdah ? "rounded-md border border-neutral-600 bg-neutral-800" : `rounded-full border bg-white/5 ${challengeActive ? "border-amber-400/40" : "border-white/20"}`}`} placeholder={challengeActive ? "Écris ta réponse au défi..." : "Pose une question ou envoie une photo..."} value={question} onChange={(e) => setQuestion(e.target.value)} onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && askAI()} disabled={isLoading} />
+            <button onClick={askAI} disabled={isLoading || (!question.trim() && !imageFile)} className={`inline-flex h-12 w-12 flex-shrink-0 items-center justify-center font-bold text-lg disabled:opacity-50 ${challengeActive ? "bg-amber-500 text-amber-950 hover:bg-amber-400" : "bg-blue-600 text-white hover:bg-blue-500"} ${isTdah ? "rounded-md" : "rounded-full"}`}>→</button>
           </div>
           <input id="homework-image-input" type="file" accept="image/*" className="hidden" onChange={(e) => { const file = e.target.files?.[0]; if (!file) { setImageFile(null); setImagePreview(null); return; } setImageFile(file); setImagePreview(URL.createObjectURL(file)); }} />
         </div>
