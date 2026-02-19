@@ -6,11 +6,18 @@ import Stripe from "stripe";
 
 export async function POST(request: Request) {
   const body = await request.text();
-  const signature = (await headers()).get("stripe-signature")!;
+  const signature = (await headers()).get("stripe-signature");
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
   let event: Stripe.Event;
+
+  if (!webhookSecret) {
+    console.warn("⚠️ STRIPE_WEBHOOK_SECRET non configuré — webhook ignoré. Utilisez /api/stripe/verify comme fallback.");
+    return NextResponse.json({ error: "Webhook secret not configured" }, { status: 400 });
+  }
+
   try {
-    event = stripe.webhooks.constructEvent(body, signature, process.env.STRIPE_WEBHOOK_SECRET!);
+    event = stripe.webhooks.constructEvent(body, signature!, webhookSecret);
   } catch (err) {
     console.error("❌ Webhook signature invalide:", err);
     return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
@@ -27,18 +34,20 @@ export async function POST(request: Request) {
         : invoice.subscription?.id;
       if (!subscriptionId) break;
 
-      const sub = await stripe.subscriptions.retrieve(subscriptionId);
+      const sub = await stripe.subscriptions.retrieve(subscriptionId, { expand: ["items.data"] });
       const userId = sub.metadata?.userId;
       if (!userId) break;
 
-      const periodEnd = (sub as unknown as { current_period_end: number }).current_period_end;
+      const item = sub.items.data[0];
+      const periodEnd = (item as unknown as { current_period_end?: number }).current_period_end
+        ?? (sub as unknown as { current_period_end?: number }).current_period_end;
 
       await prisma.user.update({
         where: { id: userId },
         data: {
           stripeSubscriptionId: sub.id,
-          stripePriceId: sub.items.data[0].price.id,
-          stripeCurrentPeriodEnd: new Date(periodEnd * 1000),
+          stripePriceId: item?.price.id ?? null,
+          stripeCurrentPeriodEnd: periodEnd ? new Date(periodEnd * 1000) : null,
         },
       });
       console.log("✅ Abonnement activé pour userId:", userId);

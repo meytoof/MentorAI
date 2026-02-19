@@ -5,6 +5,8 @@ import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import DashboardNav from "@/components/dashboard/DashboardNav";
 import { ThemeProvider } from "@/components/dashboard/ThemePicker";
+import StripeVerify from "@/components/dashboard/StripeVerify";
+import { Suspense } from "react";
 
 export default async function DashboardLayout({
   children,
@@ -29,6 +31,9 @@ export default async function DashboardLayout({
   return (
     <ThemeProvider>
       <div className="flex h-screen flex-col bg-[#0f1624]">
+        <Suspense fallback={null}>
+          <StripeVerify />
+        </Suspense>
         <DashboardNav user={session.user} xp={user.xp} streak={user.streak} />
         <div className="min-h-0 flex-1 overflow-hidden">{children}</div>
       </div>
