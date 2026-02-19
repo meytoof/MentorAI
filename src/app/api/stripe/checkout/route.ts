@@ -32,7 +32,7 @@ export async function POST(request: Request) {
     customer: customerId,
     mode: mode === "payment" ? "payment" : "subscription",
     line_items: [{ price: priceId, quantity: 1 }],
-    success_url: `${baseUrl}/dashboard?success=1`,
+    success_url: `${baseUrl}/dashboard?success=1&session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${baseUrl}/pricing?canceled=1`,
     metadata: { userId },
     ...(mode === "subscription" && {
