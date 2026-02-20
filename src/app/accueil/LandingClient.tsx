@@ -97,12 +97,20 @@ const CHAT_SCENARIOS = {
     { role: "user", text: "vous allez, ils vont !", delay: 4700 },
     { role: "ai", text: "✨ Bravo, c'est complet ! Tu l'as retenu.", delay: 5400 },
   ],
+  college: [
+    { role: "user", text: "Je comprends pas comment résoudre 2x + 5 = 13.", delay: 0 },
+    { role: "ai", text: "Bonne question ! D'abord, que cherche-t-on à trouver dans cette équation ?", delay: 900, keyword: "équation", tip: "Une équation, c'est trouver la valeur inconnue x" },
+    { role: "user", text: "La valeur de x ?", delay: 2300 },
+    { role: "ai", text: "Exactement. Pour isoler x, que faut-il faire avec le +5 des deux côtés ?", delay: 3200, keyword: "isoler x" },
+    { role: "user", text: "Le soustraire ? 2x = 8 !", delay: 4700 },
+    { role: "ai", text: "✨ Parfait ! Et maintenant, 2x = 8, donc x = ?", delay: 5400 },
+  ],
 };
 
 type ChatMsg = { role: string; text: string; delay: number; keyword?: string; tip?: string };
 
 function ChatDemo({ tdahMode = false }: { tdahMode?: boolean }) {
-  const [scenario, setScenario] = useState<"maths" | "francais" | "conjugaison">("maths");
+  const [scenario, setScenario] = useState<"maths" | "francais" | "conjugaison" | "college">("maths");
   const [visible, setVisible] = useState<number[]>([]);
   const [started, setStarted] = useState(false);
   const [showTooltip, setShowTooltip] = useState<number | null>(null);
@@ -150,9 +158,9 @@ function ChatDemo({ tdahMode = false }: { tdahMode?: boolean }) {
         </div>
         {/* Onglets scénario */}
         <div className={`flex border-b px-4 pt-2 gap-1 ${tdahMode ? "border-neutral-700" : "border-white/6"}`}>
-          {(["maths", "francais", "conjugaison"] as const).map((s) => (
+          {(["maths", "francais", "conjugaison", "college"] as const).map((s) => (
             <button key={s} onClick={() => setScenario(s)} className={`px-3 py-1.5 text-xs rounded-t-lg font-medium transition-colors ${scenario === s ? (tdahMode ? "bg-neutral-700 text-white" : "bg-blue-500/20 text-blue-300") : "text-white/35 hover:text-white/60"}`}>
-              {s === "maths" ? "Maths" : s === "francais" ? "Français" : "Conjugaison"}
+              {s === "maths" ? "Maths" : s === "francais" ? "Français" : s === "conjugaison" ? "Conjugaison" : "Collège (5e)"}
             </button>
           ))}
         </div>
@@ -285,22 +293,22 @@ function LandingClientInner() {
         <div className="grid items-center gap-16 lg:grid-cols-2">
           <div>
             <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-blue-500/30 bg-blue-500/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-blue-400">
-              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-blue-400" /> CP · CE1 · CE2 · CM1 · CM2
+              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-blue-400" /> CP → CM2 · 6e → 3e
             </div>
             <p className="mb-4 text-sm font-medium text-white/40">20h30. Les devoirs traînent. L&apos;enfant bloque. Vous aussi.</p>
             <h1 className="mb-6 text-5xl font-extrabold leading-[1.08] tracking-tight lg:text-6xl">
               <span className="relative">
-                <span className="relative z-10 text-blue-400">Fini les crises</span>
+                <span className="relative z-10 text-blue-400">Vos soirées devoirs,</span>
                 <span className="absolute -bottom-1 left-0 h-[3px] w-full rounded-full bg-blue-400/40" />
               </span>
-              <br />de devoirs.
+              <br />enfin sereines.
             </h1>
             <p className="mb-4 text-xl leading-relaxed text-white/60">
               Maieutique guide votre enfant étape par étape, lui pose les bonnes questions —{" "}
               <strong className="text-white/90">sans jamais donner la réponse.</strong>
-              {" "}Il comprend, il retient, il est fier.
+              {" "}Il comprend, il retient, il est fier.{" "}<span className="text-white/40 text-base">Du CP à la 3e.</span>
             </p>
-            <p className="mb-8 text-sm text-white/35">Conçu pour le primaire (CP–CM2) · Validé pour les profils TDAH · Pas ChatGPT : zéro triche</p>
+            <p className="mb-8 text-sm text-white/35">Du primaire (CP–CM2) au collège (6e–3e) · Conçu pour les profils TDAH · Pas ChatGPT : zéro triche</p>
             <div className="flex flex-wrap gap-4">
               {!hasAccess && (
                 <Link href={trialExpired ? "/pricing" : "/signup"} className="group inline-flex items-center gap-2 rounded-xl bg-blue-600 px-8 py-4 text-base font-bold text-white shadow-lg shadow-blue-600/25 transition-all hover:bg-blue-500 hover:scale-[1.02]">
@@ -318,7 +326,7 @@ function LandingClientInner() {
             </div>
             {!hasAccess && !trialExpired && <p className="mt-3 text-xs text-white/25">Essai gratuit 1 jour · Sans carte bancaire en bêta</p>}
             <div className="mt-8 flex flex-wrap items-center gap-5 border-t border-white/8 pt-7">
-              {[["🛡️", "Sans triche garantie"], ["🧠", "Validé experts TDAH"], ["📚", "CP → CM2"], ["⭐", "Méthode socratique"]].map(([icon, label]) => (
+              {[["🛡️", "Sans triche garantie"], ["🧠", "Validé par des parents d'enfants TDAH"], ["📚", "CP → 3e"], ["⭐", "Méthode socratique"]].map(([icon, label]) => (
                 <span key={label} className="flex items-center gap-1.5 text-xs text-white/38">{icon} {label}</span>
               ))}
             </div>
@@ -331,7 +339,7 @@ function LandingClientInner() {
       <div className="border-y border-white/5 bg-white/2 py-5 overflow-hidden">
         <div className="flex items-center gap-0 whitespace-nowrap" style={{ animation: "marquee 22s linear infinite", width: "max-content" }}>
           {[...Array(2)].flatMap((_, rep) =>
-            ["🏫 Utilisé dans 12 écoles primaires", "👨‍👩‍👧 +320 familles en bêta", "⭐ 4,8/5 satisfaction parents", "🧠 Recommandé par des orthophonistes", "📊 +40% de mémorisation des règles", "🇫🇷 100% conforme programme EN"].map((item) => (
+            ["🧠 Méthode socratique — 2 400 ans d'efficacité prouvée", "📚 Aligné sur le programme scolaire français — CP → 3e", "🔒 Zéro réponse donnée — jamais", "⚡ Disponible 24h/24 — même le dimanche à 20h30", "🇫🇷 100% en français · Adapté au programme national", "🎯 Une question à la fois — zéro surcharge cognitive", "🛡️ RGPD compliant · Données chiffrées", "💬 L'IA guide, l'enfant trouve — toujours"].map((item) => (
               <span key={`${rep}-${item}`} className="text-sm text-white/35 px-8">{item}</span>
             ))
           )}
@@ -539,8 +547,8 @@ function LandingClientInner() {
                   {[
                     "Guide par questions, ne donne jamais la réponse",
                     "L'enfant comprend et retient durablement",
-                    "Langage adapté CP → CM2, selon le niveau",
-                    "Mode TDAH validé (bulles courtes, zéro distraction)",
+                    "Langage adapté CP → 3e, selon le niveau",
+                    "Mode TDAH conçu pour les enfants TDAH (bulles courtes, zéro distraction)",
                     "Suivi par matière + historique des sessions",
                     "100% cadré scolaire, contenu filtré",
                   ].map((item) => (
@@ -614,16 +622,31 @@ function LandingClientInner() {
           </div>
           {/* Niveaux */}
           <FadeUp delay={200} className="mt-12">
-            <div className="rounded-2xl border border-white/8 bg-white/3 p-6">
-              <p className="mb-5 text-center text-sm font-semibold text-blue-300">Adapté à chaque niveau du primaire</p>
-              <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
-                {[["CP", "Lecture, petits calculs"], ["CE1", "Addition, conjugaison"], ["CE2", "Multiplication, grammaire"], ["CM1", "Fractions, rédaction"], ["CM2", "Prépa collège"]].map(([level, focus]) => (
-                  <div key={level} className="rounded-xl border border-white/8 bg-white/4 p-3 text-center">
-                    <p className="text-base font-bold text-blue-400">{level}</p>
-                    <p className="mt-1 text-xs text-white/40">{focus}</p>
-                  </div>
-                ))}
+            <div className="rounded-2xl border border-white/8 bg-white/3 p-6 space-y-5">
+              <div>
+                <p className="mb-3 text-center text-sm font-semibold text-blue-300">Primaire</p>
+                <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
+                  {[["CP", "Lecture, petits calculs"], ["CE1", "Addition, conjugaison"], ["CE2", "Multiplication, grammaire"], ["CM1", "Fractions, rédaction"], ["CM2", "Prépa collège"]].map(([level, focus]) => (
+                    <div key={level} className="rounded-xl border border-blue-500/15 bg-blue-500/5 p-3 text-center">
+                      <p className="text-base font-bold text-blue-400">{level}</p>
+                      <p className="mt-1 text-xs text-white/40">{focus}</p>
+                    </div>
+                  ))}
+                </div>
               </div>
+              <div className="border-t border-white/8" />
+              <div>
+                <p className="mb-3 text-center text-sm font-semibold text-violet-300">Collège</p>
+                <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+                  {[["6e", "Début collège"], ["5e", "Équations, géographie"], ["4e", "Algèbre, littérature"], ["3e", "Brevet, orientation"]].map(([level, focus]) => (
+                    <div key={level} className="rounded-xl border border-violet-500/15 bg-violet-500/5 p-3 text-center">
+                      <p className="text-base font-bold text-violet-400">{level}</p>
+                      <p className="mt-1 text-xs text-white/40">{focus}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <p className="text-center text-xs text-white/30">La méthode s'adapte automatiquement au niveau détecté dans l'énoncé.</p>
             </div>
           </FadeUp>
         </div>
@@ -785,30 +808,34 @@ function LandingClientInner() {
       <section className="py-24">
         <div className="mx-auto max-w-7xl px-5">
           <FadeUp className="mb-14 text-center">
-            <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-blue-400">Ils l'ont testé</p>
-            <h2 className="text-4xl font-bold">Ce que disent les parents</h2>
-            <p className="mt-3 text-white/40">Des familles en bêta depuis janvier 2026.</p>
+            <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-blue-400">En pratique</p>
+            <h2 className="text-4xl font-bold">Situations types</h2>
+            <p className="mt-3 text-white/40">Scénarios illustratifs · Bêta en cours</p>
           </FadeUp>
           <div className="grid gap-5 md:grid-cols-3">
             {[
-              { name: "Sophie M.", role: "Maman de Lucas, CE2", avatar: "S", color: "blue", stars: 5, text: "Mon fils détestait les devoirs. Avec Maieutique, il pose des questions lui-même. Il a compris qu'il peut trouver les réponses — il n'a plus besoin qu'on lui mâche le travail.", tag: "Autonomie" },
-              { name: "Thomas K.", role: "Papa de Léa, CM1 · TDAH", avatar: "T", color: "violet", stars: 5, text: "Le mode TDAH change tout. Les bulles courtes, pas d'animation qui distrait. Léa reste concentrée 20 minutes là où elle décrochait après 3. C'est concret, ça marche.", tag: "TDAH" },
-              { name: "Amina R.", role: "Maman de Yassin, CP", avatar: "A", color: "emerald", stars: 5, text: "J'avais peur que ce soit une machine à donner les réponses. C'est l'inverse. L'IA pose des questions, guide doucement. Mon fils est fier quand il trouve seul.", tag: "Confiance" },
+              { label: "Scénario", role: "Parent · enfant en CE2", icon: "📖", color: "blue",
+                text: "\"Il bloquait sur ses tables de multiplication. Il a commencé à poser ses propres questions à l'IA — et il a trouvé 7 × 8 seul. Je n'avais pas eu à intervenir.\"",
+                tag: "Autonomie" },
+              { label: "Scénario", role: "Parent · enfant CM1 · profil TDAH", icon: "🧠", color: "violet",
+                text: "\"Les bulles courtes du mode TDAH font vraiment la différence. Il reste concentré plus longtemps sans qu'on doive le relancer toutes les deux minutes.\"",
+                tag: "TDAH" },
+              { label: "Scénario", role: "Parent · enfant en CP", icon: "✨", color: "emerald",
+                text: "\"J'avais peur que l'IA donne les réponses. C'est l'inverse : elle pose des questions, guide doucement. Mon enfant est fier quand il trouve seul.\"",
+                tag: "Confiance" },
             ].map((t, i) => {
-              const cls: Record<string, string> = { blue: "bg-blue-600", violet: "bg-violet-600", emerald: "bg-emerald-600" };
               const tagCls: Record<string, string> = { blue: "text-blue-400 border-blue-500/30 bg-blue-500/8", violet: "text-violet-400 border-violet-500/30 bg-violet-500/8", emerald: "text-emerald-400 border-emerald-500/30 bg-emerald-500/8" };
               return (
-                <FadeUp key={t.name} delay={i * 100}>
+                <FadeUp key={t.label + i} delay={i * 100}>
                   <div className="flex h-full flex-col rounded-2xl border border-white/8 bg-white/3 p-6 hover:border-white/15 transition-colors">
                     <div className="mb-4 flex items-center justify-between">
-                      <span className="text-yellow-400 text-sm">{"★".repeat(t.stars)}</span>
+                      <span className="text-2xl">{t.icon}</span>
                       <span className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold ${tagCls[t.color]}`}>{t.tag}</span>
                     </div>
-                    <p className="mb-5 flex-1 text-sm leading-relaxed text-white/62 italic">"{t.text}"</p>
+                    <p className="mb-5 flex-1 text-sm leading-relaxed text-white/62 italic">{t.text}</p>
                     <div className="flex items-center gap-3 border-t border-white/8 pt-4">
-                      <div className={`flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full ${cls[t.color]} text-sm font-bold`}>{t.avatar}</div>
                       <div>
-                        <p className="text-sm font-semibold">{t.name}</p>
+                        <p className="text-sm font-semibold">{t.label}</p>
                         <p className="text-xs text-white/30">{t.role}</p>
                       </div>
                     </div>
@@ -820,7 +847,7 @@ function LandingClientInner() {
           {/* Metric bar */}
           <FadeUp delay={200} className="mt-12">
             <div className="grid grid-cols-2 gap-5 md:grid-cols-4 rounded-2xl border border-white/8 bg-white/3 p-6">
-              {[["4,8/5", "Satisfaction parents"], ["320+", "Familles en bêta"], ["12", "Écoles partenaires"], ["94%", "Recommanderaient"]].map(([val, label]) => (
+              {[["Bêta", "En cours d'ouverture"], ["2400", "ans de méthode socratique"], ["0", "réponse jamais donnée"], ["24h/24", "Disponibilité réelle"]].map(([val, label]) => (
                 <div key={label} className="text-center">
                   <p className="text-3xl font-extrabold text-white">{val}</p>
                   <p className="mt-1 text-xs text-white/38">{label}</p>
@@ -854,7 +881,7 @@ function LandingClientInner() {
               },
               {
                 q: "Mon enfant est au collège, ça marche aussi ?",
-                a: "Maieutique est aujourd'hui optimisé pour le primaire (CP à CM2). Le contenu, le langage et les méthodes sont calibrés pour cette tranche d'âge. Le collège arrive bientôt — inscrivez-vous pour être prévenu.",
+                a: "Oui ! Maieutique s'adapte du CP à la 3e. La méthode socratique fonctionne pour tous les niveaux : qu'il s'agisse de tables de multiplication en CE2 ou d'équations du premier degré en 5e, l'IA guide sans jamais donner la réponse.",
               },
             ].map(({ q, a }, i) => (
               <FadeUp key={q} delay={i * 80}>
@@ -938,7 +965,7 @@ function LandingClientInner() {
                 <div className="mb-1 flex items-end gap-1"><span className="text-5xl font-extrabold">80€</span><span className="mb-1.5 text-sm text-white/38">une fois</span></div>
                 <p className="mb-5 text-xs text-white/28">Accès à vie pour un enfant</p>
                 <ul className="mb-8 flex-1 space-y-2.5 text-sm text-white/55">
-                  {["Tout l'abonnement mensuel", "À vie sans renouvellement", "Idéal CP → CM2"].map(f => (
+                  {["Tout l'abonnement mensuel", "À vie sans renouvellement", "Idéal CP → 3e"].map(f => (
                     <li key={f} className="flex items-center gap-2"><span className="text-violet-400">✓</span>{f}</li>
                   ))}
                 </ul>
@@ -959,7 +986,7 @@ function LandingClientInner() {
           <h2 className="mb-4 text-4xl font-extrabold leading-tight lg:text-5xl">
             Prêt à transformer<br />les soirées devoirs ?
           </h2>
-          <p className="mb-8 text-lg text-white/42">Rejoignez les 320+ familles qui font confiance à Maieutique.</p>
+          <p className="mb-8 text-lg text-white/42">Rejoignez les premiers à découvrir Maieutique.</p>
           {hasAccess ? (
             <Link href="/dashboard" className="inline-flex items-center gap-3 rounded-xl bg-blue-600 px-10 py-4 text-lg font-bold text-white shadow-xl shadow-blue-600/20 transition-all hover:bg-blue-500 hover:shadow-blue-500/25 hover:scale-[1.03]">
               Accéder à mon tableau de bord →
@@ -974,7 +1001,7 @@ function LandingClientInner() {
           )}
           {/* Mini trust */}
           <div className="mt-10 flex flex-wrap items-center justify-center gap-6">
-            {["🛡️ RGPD compliant", "🇫🇷 Hébergé en France", "🔒 Données chiffrées", "👨‍👩‍👧 Adapté 6–11 ans"].map(b => (
+            {["🛡️ RGPD compliant", "🇫🇷 Hébergé en France", "🔒 Données chiffrées", "👨‍👩‍👧 Adapté 6–15 ans"].map(b => (
               <span key={b} className="text-xs text-white/28">{b}</span>
             ))}
           </div>
@@ -991,7 +1018,7 @@ function LandingClientInner() {
             <a href="/mentions-legales" className="hover:text-white/55 transition-colors">Mentions légales</a>
             <a href="/confidentialite" className="hover:text-white/55 transition-colors">Confidentialité</a>
             <a href="/cgv" className="hover:text-white/55 transition-colors">CGV</a>
-            <a href="mailto:contact@maieutique.app" className="hover:text-white/55 transition-colors">Contact</a>
+            <a href="mailto:maieutiquecontacts@gmail.com" className="hover:text-white/55 transition-colors">Contact</a>
           </div>
           <p>Fait avec ❤️ pour les enfants qui apprennent différemment</p>
         </div>

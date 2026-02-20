@@ -15,7 +15,7 @@ export default function ConfidentialitePage() {
       <div className="space-y-8 text-neutral-300">
         <section>
           <h2 className="mb-3 text-xl font-semibold text-white">1. Responsable du traitement</h2>
-          <p>Maieutique — <a href="mailto:contact@maieutique.app" className="text-blue-400 hover:underline">contact@maieutique.app</a></p>
+          <p>Maieutique — <a href="mailto:maieutiquecontacts@gmail.com" className="text-blue-400 hover:underline">maieutiquecontacts@gmail.com</a></p>
         </section>
         <section>
           <h2 className="mb-3 text-xl font-semibold text-white">2. Données collectées</h2>
@@ -43,7 +43,7 @@ export default function ConfidentialitePage() {
         </section>
         <section>
           <h2 className="mb-3 text-xl font-semibold text-white">5. Vos droits</h2>
-          <p>Accès, rectification, effacement, portabilité, opposition. Contact : <a href="mailto:contact@maieutique.app" className="text-blue-400 hover:underline">contact@maieutique.app</a>. Réponse sous 30 jours. Réclamation : <a href="https://www.cnil.fr" className="text-blue-400 hover:underline">cnil.fr</a></p>
+          <p>Accès, rectification, effacement, portabilité, opposition. Contact : <a href="mailto:maieutiquecontacts@gmail.com" className="text-blue-400 hover:underline">maieutiquecontacts@gmail.com</a>. Réponse sous 30 jours. Réclamation : <a href="https://www.cnil.fr" className="text-blue-400 hover:underline">cnil.fr</a></p>
         </section>
       </div>
     </div>

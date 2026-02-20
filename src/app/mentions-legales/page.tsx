@@ -14,7 +14,7 @@ export default function MentionsLegalesPage() {
       <div className="space-y-8 text-neutral-300">
         <section>
           <h2 className="mb-3 text-xl font-semibold text-white">Éditeur</h2>
-          <p>Maieutique — <a href="mailto:contact@maieutique.app" className="text-blue-400 hover:underline">contact@maieutique.app</a></p>
+          <p>Maieutique — <a href="mailto:maieutiquecontacts@gmail.com" className="text-blue-400 hover:underline">maieutiquecontacts@gmail.com</a></p>
         </section>
         <section>
           <h2 className="mb-3 text-xl font-semibold text-white">Hébergement</h2>

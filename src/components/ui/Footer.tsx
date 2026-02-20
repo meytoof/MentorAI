@@ -59,7 +59,7 @@ export default function Footer() {
             <h3 className="mb-4 text-sm font-semibold text-white">Support</h3>
             <ul className="space-y-2 text-sm">
               <li>
-                <a href="mailto:contact@maieutique.app" className="text-neutral-400 hover:text-white transition-colors">
+                <a href="mailto:maieutiquecontacts@gmail.com" className="text-neutral-400 hover:text-white transition-colors">
                   Contact
                 </a>
               </li>

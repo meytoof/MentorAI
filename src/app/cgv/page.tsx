@@ -39,7 +39,7 @@ export default function CGVPage() {
         </section>
         <section>
           <h2 className="mb-3 text-xl font-semibold text-white">6. Contact</h2>
-          <p><a href="mailto:contact@maieutique.app" className="text-blue-400 hover:underline">contact@maieutique.app</a></p>
+          <p><a href="mailto:maieutiquecontacts@gmail.com" className="text-blue-400 hover:underline">maieutiquecontacts@gmail.com</a></p>
         </section>
       </div>
     </div>
