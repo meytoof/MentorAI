@@ -30,6 +30,10 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
+  icons: {
+    icon: "/logo-maieutique.png",
+    apple: "/logo-maieutique.png",
+  },
 };
 
 export default function RootLayout({

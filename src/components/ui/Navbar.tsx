@@ -52,7 +52,9 @@ function NavbarContent() {
             </div>
             <div className="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
               <div className="flex shrink-0 items-center">
-                <Image alt="Logo" width={32} height={32} src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=500" className="size-8" />
+                <a href="/accueil">
+                  <Image alt="Maïeutique" width={36} height={36} src="/logo-maieutique.png" className="size-9 rounded-full" />
+                </a>
               </div>
               <div className="hidden sm:ml-6 sm:block">
                 <div className="flex space-x-4">

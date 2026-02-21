@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find:*)",
+      "Bash(npx prisma migrate dev:*)",
+      "Bash(npx prisma generate:*)",
+      "Bash(npx tsc:*)",
+      "Bash(git add:*)",
+      "Bash(ls:*)",
+      "Bash(dir \"C:\\\\wamp64\\\\www\\\\devoirs\" /B)",
+      "Bash(powershell -Command \"\\(Get-Item ''C:\\\\Users\\\\quent\\\\Downloads\\\\IMG_0963.jpg''\\).Length / 1MB\")",
+      "Bash(node -e:*)",
+      "Bash(npm install:*)",
+      "Bash(taskkill:*)",
+      "Bash(npx prisma db execute:*)",
+      "Bash(powershell -Command \"cd ''C:\\\\wamp64\\\\www\\\\devoirs''; npm install @prisma/adapter-libsql @libsql/client 2>&1\")",
+      "Bash(powershell -Command:*)"
+    ]
+  }
+}
