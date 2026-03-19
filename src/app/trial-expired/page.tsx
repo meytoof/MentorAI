@@ -31,7 +31,7 @@ export default function TrialExpiredPage() {
             <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-blue-400">
               Mensuel
             </p>
-            <p className="mb-1 text-2xl font-bold text-white">14,90 €</p>
+            <p className="mb-1 text-2xl font-bold text-white">2,99 €</p>
             <p className="mb-3 text-xs text-white/50">par mois · résiliable à tout moment</p>
             <ul className="mb-4 space-y-1 text-xs text-white/70">
               <li>✓ Aide illimitée</li>
@@ -51,7 +51,7 @@ export default function TrialExpiredPage() {
             <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-white/50">
               Sérénité
             </p>
-            <p className="mb-1 text-2xl font-bold text-white">80 €</p>
+            <p className="mb-1 text-2xl font-bold text-white">40 €</p>
             <p className="mb-3 text-xs text-white/50">paiement unique · accès à vie</p>
             <ul className="mb-4 space-y-1 text-xs text-white/70">
               <li>✓ Accès à vie</li>

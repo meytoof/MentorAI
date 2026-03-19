@@ -25,7 +25,7 @@ const plans = [
   {
     id: "monthly",
     name: "Maieutique Mensuel",
-    price: "14,90€",
+    price: "2,99€",
     period: "/ mois",
     description: "Accès illimité, résiliable à tout moment",
     features: [
@@ -44,7 +44,7 @@ const plans = [
   {
     id: "lifetime",
     name: "Maieutique à Vie",
-    price: "80€",
+    price: "40€",
     period: "une fois",
     description: "Paiement unique, accès permanent",
     features: [

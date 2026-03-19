@@ -21,8 +21,8 @@ export default function CGVPage() {
           <h2 className="mb-3 text-xl font-semibold text-white">2. Offres et tarifs</h2>
           <ul className="list-disc space-y-2 pl-6">
             <li><strong className="text-white">Essai gratuit 1 jour</strong> — accès complet, sans engagement, sans carte bancaire.</li>
-            <li><strong className="text-white">Abonnement mensuel — 14,90 € / mois</strong> — annulable à tout moment.</li>
-            <li><strong className="text-white">Formule sérénité — 80 € une fois</strong> — accès à vie pour un enfant.</li>
+            <li><strong className="text-white">Abonnement mensuel — 2,99 € / mois</strong> — annulable à tout moment.</li>
+            <li><strong className="text-white">Formule sérénité — 40 € une fois</strong> — accès à vie pour un enfant.</li>
           </ul>
         </section>
         <section>

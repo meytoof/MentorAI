@@ -921,7 +921,7 @@ function LandingClientInner() {
               </div>
               <div className="rounded-xl border border-blue-500/30 bg-blue-500/8 p-4 text-center">
                 <p className="text-xs font-semibold uppercase text-blue-400">Maieutique</p>
-                <p className="mt-1 text-2xl font-extrabold text-blue-300">14,90€<span className="text-base font-normal text-blue-300/50">/mois</span></p>
+                <p className="mt-1 text-2xl font-extrabold text-blue-300">2,99€<span className="text-base font-normal text-blue-300/50">/mois</span></p>
                 <p className="mt-1 text-xs text-blue-300/50">Illimité · 24h/24 · 7j/7</p>
               </div>
             </div>
@@ -946,8 +946,8 @@ function LandingClientInner() {
               <div className="relative flex h-full flex-col rounded-2xl border-2 border-blue-500 bg-blue-600/8 p-7 shadow-lg shadow-blue-500/10">
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-blue-500 px-4 py-1 text-xs font-bold">Recommandé</div>
                 <p className="mb-1 text-sm font-semibold text-blue-300">Abonnement mensuel</p>
-                <div className="mb-1 flex items-end gap-1"><span className="text-5xl font-extrabold">14,90€</span><span className="mb-1.5 text-sm text-white/38">/mois</span></div>
-                <p className="mb-1 text-xs text-blue-300/60">Moins de 0,50 € par jour</p>
+                <div className="mb-1 flex items-end gap-1"><span className="text-5xl font-extrabold">2,99€</span><span className="mb-1.5 text-sm text-white/38">/mois</span></div>
+                <p className="mb-1 text-xs text-blue-300/60">Moins de 0,10 € par jour</p>
                 <p className="mb-5 text-xs text-white/28">Disponible à 21h quand les devoirs traînent</p>
                 <ul className="mb-8 flex-1 space-y-2.5 text-sm text-white/68">
                   {["Aide illimitée 24h/24, 7j/7", "Historique pédagogique", "Profil TDAH optimisé", "Annulable à tout moment"].map(f => (
@@ -962,7 +962,7 @@ function LandingClientInner() {
             <FadeUp delay={160}>
               <div className="flex h-full flex-col rounded-2xl border border-white/10 bg-white/3 p-7">
                 <p className="mb-1 text-sm font-semibold text-white/45">Formule sérénité</p>
-                <div className="mb-1 flex items-end gap-1"><span className="text-5xl font-extrabold">80€</span><span className="mb-1.5 text-sm text-white/38">une fois</span></div>
+                <div className="mb-1 flex items-end gap-1"><span className="text-5xl font-extrabold">40€</span><span className="mb-1.5 text-sm text-white/38">une fois</span></div>
                 <p className="mb-5 text-xs text-white/28">Accès à vie pour un enfant</p>
                 <ul className="mb-8 flex-1 space-y-2.5 text-sm text-white/55">
                   {["Tout l'abonnement mensuel", "À vie sans renouvellement", "Idéal CP → 3e"].map(f => (
